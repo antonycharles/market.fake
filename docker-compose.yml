@@ -55,6 +55,22 @@ services:
         networks:
             - project-network
 
+    userapi:
+        build:
+            context: ./user.api
+            dockerfile: Dockerfile
+        container_name: user-api
+        ports:
+            - "9500:8080"
+        networks: 
+            - project-network
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+        depends_on:
+            - dbpostgresql
+            - message.broker.rabbitmq
+            - redis
+
     accountsapi:
         build:
             context: ./accounts.api
