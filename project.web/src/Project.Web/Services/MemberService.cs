@@ -32,7 +32,7 @@ namespace Project.Web.Services
         public async Task<MemberDto> GetByIdAsync(Guid id)
         {
             await AddBearerTokenAsync();
-            var response = await _http.GetAsync($"/v1/Member/{id}");
+            var response = await _http.GetAsync($"v1/Member/{id}");
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<MemberDto>();
@@ -45,7 +45,7 @@ namespace Project.Web.Services
         public async Task<List<MemberDto>> GetAllAsync(Guid? projectId = null)
         {
             await AddBearerTokenAsync();
-            string url = "/v1/Member";
+            string url = "v1/Member";
             if (projectId.HasValue)
                 url += $"?projectId={projectId}";
             return await _http.GetFromJsonAsync<List<MemberDto>>(url);
@@ -54,7 +54,7 @@ namespace Project.Web.Services
         public async Task<MemberDto> CreateAsync(MemberCreateDto dto)
         {
             await AddBearerTokenAsync();
-            var response = await _http.PostAsJsonAsync("/v1/Member", dto);
+            var response = await _http.PostAsJsonAsync("v1/Member", dto);
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<MemberDto>();
@@ -66,7 +66,7 @@ namespace Project.Web.Services
         public async Task DeleteAsync(Guid id)
         {
             await AddBearerTokenAsync();
-            var response = await _http.DeleteAsync($"/v1/Member/{id}");
+            var response = await _http.DeleteAsync($"v1/Member/{id}");
             if (!response.IsSuccessStatusCode && response.StatusCode != System.Net.HttpStatusCode.NoContent)
             {
                 var problem = await response.Content.ReadAsStringAsync();

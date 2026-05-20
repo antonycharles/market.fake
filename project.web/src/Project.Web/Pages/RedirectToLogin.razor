@@ -7,9 +7,9 @@
 @code {
     protected override void OnInitialized()
     {
-        var callbackUrl = Nav.ToAbsoluteUri("/auth/callback").ToString();
+        var callbackUrl = Nav.ToAbsoluteUri("auth/callback").ToString();
         var redirectUrl = Uri.EscapeDataString(callbackUrl);
 
-        Nav.NavigateTo(Config["LoginWebUrl"] + "/login?appSlug=project-api&redirectUrl=" + redirectUrl, true);
+        Nav.NavigateTo(Config["LoginWebUrl"] + "login?appSlug=project-api&redirectUrl=" + redirectUrl, true);
     }
 }

@@ -30,10 +30,10 @@ else
             <p class="card-text mb-4"><strong>Description:</strong> @(string.IsNullOrWhiteSpace(project.Description) ? "No description provided." : project.Description)</p>
 
             <div class="d-flex flex-wrap gap-2">
-                <a href="/projects/update/@project.Id" class="btn btn-warning">Edit</a>
-                <a href="/members/project/@project.Id" class="btn btn-info">Members</a>
+                <a href="projects/update/@project.Id" class="btn btn-warning">Edit</a>
+                <a href="members/project/@project.Id" class="btn btn-info">Members</a>
                 <button type="button" class="btn btn-danger" @onclick="OpenDeleteModal">Delete</button>
-                <a href="/projects" class="btn btn-outline-secondary">Back to List</a>
+                <a href="projects" class="btn btn-outline-secondary">Back to List</a>
             </div>
         </div>
     </div>
@@ -118,7 +118,7 @@ else
         {
             isDeleting = true;
             await ProjectService.Delete(project.Id);
-            Navigation.NavigateTo("/projects");
+            Navigation.NavigateTo("projects");
         }
         catch (Exception ex)
         {

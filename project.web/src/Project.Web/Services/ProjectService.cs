@@ -36,19 +36,19 @@ namespace Project.Web.Services
         public async Task<List<ProjectDto>> GetAll()
         {
             await AddBearerTokenAsync();
-            return await _http.GetFromJsonAsync<List<ProjectDto>>("/v1/Project");
+            return await _http.GetFromJsonAsync<List<ProjectDto>>("v1/Project");
         }
 
         public async Task<ProjectDto> Get(Guid id)
         {
             await AddBearerTokenAsync();
-            return await _http.GetFromJsonAsync<ProjectDto>($"/v1/Project/{id}");
+            return await _http.GetFromJsonAsync<ProjectDto>($"v1/Project/{id}");
         }
 
         public async Task<ProjectDto> Create(ProjectCreateDto dto)
         {
             await AddBearerTokenAsync();
-            var res = await _http.PostAsJsonAsync("/v1/Project", dto);
+            var res = await _http.PostAsJsonAsync("v1/Project", dto);
             if (res.IsSuccessStatusCode)
             {
                 return await res.Content.ReadFromJsonAsync<ProjectDto>();
@@ -86,7 +86,7 @@ namespace Project.Web.Services
         public async Task<ProjectDto> Update(ProjectDto dto)
         {
             await AddBearerTokenAsync();
-            var res = await _http.PutAsJsonAsync($"/v1/Project/{dto.Id}", dto);
+            var res = await _http.PutAsJsonAsync($"v1/Project/{dto.Id}", dto);
             if (res.IsSuccessStatusCode)
             {
                 if (res.StatusCode == System.Net.HttpStatusCode.NoContent)
@@ -124,7 +124,7 @@ namespace Project.Web.Services
         public async Task Delete(Guid id)
         {
             await AddBearerTokenAsync();
-            var res = await _http.DeleteAsync($"/v1/Project/{id}");
+            var res = await _http.DeleteAsync($"v1/Project/{id}");
 
             if (!res.IsSuccessStatusCode)
             {

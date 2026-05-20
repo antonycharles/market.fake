@@ -14,7 +14,7 @@ namespace Project.Web.Services
 
         public async Task<OAuthResponse> ExchangeCodeForJwtAsync(string code)
         {
-            var url = $"/Login/token?code={code}";
+            var url = $"Login/token?code={code}";
 
             var response = await _httpClient.GetAsync(url);
 

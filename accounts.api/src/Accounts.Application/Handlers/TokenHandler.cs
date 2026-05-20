@@ -164,6 +164,7 @@ namespace Accounts.Application.Handlers
             redirectUrl = redirectUrl?.Trim();
 
             var callbackExists = await _context.AppCallbacks.AsNoTracking()
+                .Include(i => i.App)
                 .AnyAsync(w =>
                     w.IsDeleted == false &&
                     w.Status == StatusEnum.Active &&

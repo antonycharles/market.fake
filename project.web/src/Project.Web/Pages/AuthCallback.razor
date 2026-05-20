@@ -29,6 +29,6 @@
         await localStorage.RemoveItemAsync("jwt");
         await localStorage.SetItemAsync<OAuthResponse>("jwt", token);
 
-        Nav.NavigateTo("/");
+        Nav.NavigateTo("");
     }
 }

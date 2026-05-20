@@ -9,8 +9,8 @@
 </div>
 
 <div class="d-flex gap-2">
-    <a class="btn btn-primary" href="/projects/@Id">Go to Details</a>
-    <a class="btn btn-outline-secondary" href="/projects">Back to List</a>
+    <a class="btn btn-primary" href="projects/@Id">Go to Details</a>
+    <a class="btn btn-outline-secondary" href="projects">Back to List</a>
 </div>
 
 @code {
@@ -19,6 +19,6 @@
 
     protected override void OnInitialized()
     {
-        Navigation.NavigateTo($"/projects/{Id}", true);
+        Navigation.NavigateTo($"projects/{Id}", true);
     }
 }

@@ -64,7 +64,7 @@ else
         try
         {
             var result = await ProjectService.Update(project);
-            Navigation.NavigateTo("/projects/" + id);
+            Navigation.NavigateTo("projects/" + id);
         }
         catch (Exception ex)
         {
