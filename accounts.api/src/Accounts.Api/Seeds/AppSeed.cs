@@ -74,8 +74,8 @@ namespace Accounts.Api.Seeds
             apps.Add(new App{
                 Code = 7,
                 Type = AppTypeEnum.Api,
-                Name = "Project - Web",
-                Slug = "project-api",
+                Name = "Market - Web",
+                Slug = "market-api",
                 FaviconUrl = $"{settings.FileApiUrl}/File/71402371-2fc0-4e15-b9e0-384f45508afb",
                 IsPublic = true,
                 Status = StatusEnum.Active

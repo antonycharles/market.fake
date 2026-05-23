@@ -13,7 +13,7 @@ namespace Accounts.Api.Seeds
         public static void Seeder(AccountsContext context){
             SeederAccounts(context);
             SeederManagement(context);
-            SeederProjectApi(context);
+            SeederMarketApi(context);
 
             context.SaveChanges();
         } 
@@ -72,9 +72,9 @@ namespace Accounts.Api.Seeds
         }
 
 
-        private static void SeederProjectApi(AccountsContext context)
+        private static void SeederMarketApi(AccountsContext context)
         {
-            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "project-api");
+            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "market-api");
 
             if (app == null)
                 return;

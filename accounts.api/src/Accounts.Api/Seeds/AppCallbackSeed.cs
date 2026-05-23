@@ -34,7 +34,7 @@ namespace Accounts.Api.Seeds
             callbacks.Add(new AppCallback{
                 Url = "http://localhost/project/auth/callback",
                 Environment = Core.Enums.EnvironmentEnum.Staging,
-                AppId = apps.FirstOrDefault(a => a.Slug == "project-api").Id,
+                AppId = apps.FirstOrDefault(a => a.Slug == "market-api").Id,
                 IsDefault = true
             });
 

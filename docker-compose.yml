@@ -104,14 +104,14 @@ services:
             - dbpostgresql
             - message.broker.rabbitmq
             - redis
-    projectapi:
+    marketapi:
         build:
             context: .
-            dockerfile: ./project.api/Dockerfile
+            dockerfile: ./market.api/Dockerfile
             args:
                 GITHUB_PACKAGES_USERNAME: ${GITHUB_PACKAGES_USERNAME}
                 GITHUB_PACKAGES_TOKEN: ${GITHUB_PACKAGES_TOKEN}
-        container_name: project-api
+        container_name: market-api
         ports:
             - "9503:8080"
         networks: 
@@ -170,7 +170,7 @@ services:
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
         depends_on:
-            - projectapi
+            - marketapi
 
     apigateway:
         image: nginx:1.27-alpine
@@ -185,7 +185,7 @@ services:
             - userapi
             - accountsapi
             - fileapi
-            - projectapi
+            - marketapi
             - accountsloginweb
             - accountsmanagementweb
             - projectweb

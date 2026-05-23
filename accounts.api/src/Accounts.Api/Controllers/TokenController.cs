@@ -51,8 +51,13 @@ namespace Accounts.Api.Controllers
         [AllowAnonymous]
         public IActionResult GetOpenIdConfiguration()
         {
-            // Ajuste o issuer conforme o endereço público da sua API
-            var issuer = $"{Request.Scheme}://{Request.Host}/v1";
+            var forwardedPrefix = Request.Headers["X-Forwarded-Prefix"].FirstOrDefault();
+            var prefix = string.IsNullOrWhiteSpace(forwardedPrefix)
+                ? Request.PathBase.Value
+                : forwardedPrefix;
+
+            prefix = string.IsNullOrWhiteSpace(prefix) ? string.Empty : $"/{prefix.Trim('/')}";
+            var issuer = $"{Request.Scheme}://{Request.Host}{prefix}/v1";
 
             var config = new
             {

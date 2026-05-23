@@ -85,7 +85,29 @@ app.SeedData(settings);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger(c =>
+    {
+        c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+        {
+            var basePath = httpReq.Headers["X-Forwarded-Prefix"].FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(basePath) &&
+                Uri.TryCreate(httpReq.Headers.Referer.FirstOrDefault(), UriKind.Absolute, out var referer))
+            {
+                var swaggerPathIndex = referer.AbsolutePath.IndexOf("/swagger", StringComparison.OrdinalIgnoreCase);
+                if (swaggerPathIndex > 0)
+                    basePath = referer.AbsolutePath[..swaggerPathIndex];
+            }
+
+            if (!string.IsNullOrWhiteSpace(basePath))
+            {
+                swaggerDoc.Servers = new List<OpenApiServer>
+                {
+                    new() { Url = basePath.TrimEnd('/') }
+                };
+            }
+        });
+    });
     app.UseSwaggerUI();
 }
 

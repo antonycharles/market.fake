@@ -16,7 +16,7 @@ namespace Accounts.Api.Seeds
             SeederAccountsApi(context);
             SeederAccountsManagement(context);
             SeederFileApi(context);
-            SeederProjectApi(context);
+            SeederMarketApi(context);
             SeederAccountsLoginWeb(context);
 
             context.SaveChanges();
@@ -106,9 +106,9 @@ namespace Accounts.Api.Seeds
             }
         }
 
-        private static void SeederProjectApi(AccountsContext context)
+        private static void SeederMarketApi(AccountsContext context)
         {
-            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "project-api");
+            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "market-api");
 
             if(app == null)
                 return;

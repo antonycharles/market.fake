@@ -18,14 +18,14 @@ namespace Accounts.Api.Seeds
             SeederAccountsManagementAdmin(context);
             SeederAccountsManagementUser(context);
             SeederAccountsApiPublicToken(context);
-            SeederProjectApiUser(context);
+            SeederMarketApiUser(context);
 
             context.SaveChanges();
         }
 
-        private static void SeederProjectApiUser(AccountsContext context)
+        private static void SeederMarketApiUser(AccountsContext context)
         {
-            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "project-api");
+            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "market-api");
 
             if(app == null)
                 return;

@@ -13,7 +13,7 @@ namespace Project.Web.Services
 
         public ProjectService(IConfiguration configuration, AuthenticationStateProvider authStateProvider)
         {
-            _http = new HttpClient { BaseAddress = new Uri(configuration["AccountsApiUrl"]) };
+            _http = new HttpClient { BaseAddress = new Uri(configuration["MarketApiUrl"]) };
             _authStateProvider = authStateProvider;
         }
 
