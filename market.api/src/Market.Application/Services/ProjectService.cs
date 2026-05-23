@@ -8,6 +8,8 @@ using Market.Domain.Interfaces;
 using Market.Domain.Entities;
 using Market.Domain.Exceptions;
 using Market.Domain.Enums;
+using Messaging.Abstractions;
+using Messaging.Contracts.Events;
 
 namespace Market.Application.Services
 {
@@ -15,11 +17,13 @@ namespace Market.Application.Services
     {
         private readonly IProjectRepository _ProjectRepository;
         private readonly IMemberService _memberService;
+        private readonly IEventBus _eventBus;
 
-        public ProjectService(IProjectRepository ProjectRepository, IMemberService memberService)
+        public ProjectService(IProjectRepository ProjectRepository, IMemberService memberService, IEventBus eventBus)
         {
             _ProjectRepository = ProjectRepository;
             _memberService = memberService;
+            _eventBus = eventBus;
         }
 
         public async Task<ProjectDto?> GetByIdAsync(Guid id)
@@ -54,6 +58,10 @@ namespace Market.Application.Services
                 UserId = dto.UserCreatedId,
                 ProjectId = project.Id
             });
+
+            var item = new Project_Created_Event(project.Id, Guid.Empty, project.Name, project.Status.ToString());
+
+            await _eventBus.PublishAsync(item);
 
             return MapToDto(project);
         }

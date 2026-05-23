@@ -23,6 +23,7 @@ builder.Configuration.AddEnvironmentVariables();
 
 var connectionString = settings.ConnectionString;
 
+builder.Services.AddScoped<IDbConnectionFactory, NpgsqlConnectionFactory>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<IClientAuthorizationRepository, ClientAuthorizationRepository>();

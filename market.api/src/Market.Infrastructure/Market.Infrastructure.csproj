@@ -4,7 +4,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <MessagingPackagesVersion>1.0.0.4</MessagingPackagesVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,12 +17,10 @@
 </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
-    <PackageReference Include="Messaging.Abstractions" Version="$(MessagingPackagesVersion)" />
-    <PackageReference Include="Messaging.Contracts" Version="$(MessagingPackagesVersion)" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
   </ItemGroup>
 
 </Project>

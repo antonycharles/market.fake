@@ -1,149 +1,100 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Npgsql;
+using Dapper;
 using Market.Domain.Interfaces;
-using Market.Domain.Entities;
-using Microsoft.Extensions.Configuration;
-using Market.Domain.Settings;
-using Microsoft.Extensions.Options;
-using Messaging.Abstractions;
-using Messaging.Contracts.Events;
+using Market.Infrastructure.Data;
 
 namespace Market.Infrastructure.Repositories
 {
     public class ProjectRepository: IProjectRepository
     {
-        private readonly string _connectionString;
-        private readonly IEventBus _eventBus;
+        private readonly IDbConnectionFactory _connectionFactory;
 
-        public ProjectRepository(IOptions<ProjectSettings> options, IEventBus eventBus)
+        public ProjectRepository(IDbConnectionFactory connectionFactory)
         {
-            _connectionString = options.Value.ConnectionString;
-            _eventBus = eventBus;
+            _connectionFactory = connectionFactory;
         }
 
-        public async Task<Domain.Entities.Project> GetByIdAsync(Guid id)
+        public async Task<Domain.Entities.Project?> GetByIdAsync(Guid id)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            using var connection = await _connectionFactory.CreateOpenConnectionAsync();
 
-            var command = new NpgsqlCommand(@"
+            const string sql = @"
                 SELECT ""Id"", ""Name"", ""Description"", ""UserCreatedId"", ""CreatedAt"", ""UpdatedAt"", ""Status""
                 FROM ""Project""
-                WHERE ""Id"" = @id AND ""DeletedAt"" IS NULL", connection);
+                WHERE ""Id"" = @Id AND ""DeletedAt"" IS NULL";
 
-            command.Parameters.AddWithValue("@id", id);
-
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            {
-                return MapProject(reader);
-            }
-
-            return null;
+            return await connection.QueryFirstOrDefaultAsync<Domain.Entities.Project>(sql, new { Id = id });
         }
 
         public async Task<IEnumerable<Domain.Entities.Project>> GetAllAsync()
         {
-            var projects = new List<Domain.Entities.Project>();
+            using var connection = await _connectionFactory.CreateOpenConnectionAsync();
 
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            var command = new NpgsqlCommand(@"
+            const string sql = @"
                 SELECT ""Id"", ""Name"", ""Description"", ""UserCreatedId"", ""CreatedAt"", ""UpdatedAt"", ""Status""
                 FROM ""Project""
-                WHERE ""DeletedAt"" IS NULL", connection);
+                WHERE ""DeletedAt"" IS NULL";
 
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                projects.Add(MapProject(reader));
-            }
-
-            return projects;
+            return await connection.QueryAsync<Domain.Entities.Project>(sql);
         }
 
         public async Task AddAsync(Domain.Entities.Project Project)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            using var connection = await _connectionFactory.CreateOpenConnectionAsync();
 
-            var command = new NpgsqlCommand(@"
+            const string sql = @"
                 INSERT INTO ""Project"" 
                 (""Id"", ""Name"", ""Description"", ""UserCreatedId"", ""CreatedAt"", ""UpdatedAt"", ""Status"")
                 VALUES
-                (@id, @name, @description, @userCreatedId, @createdAt, @updatedAt, @status)", connection);
+                (@Id, @Name, @Description, @UserCreatedId, @CreatedAt, @UpdatedAt, @Status)";
 
-            command.Parameters.AddWithValue("@id", Project.Id);
-            command.Parameters.AddWithValue("@name", Project.Name);
-            command.Parameters.AddWithValue("@description", (object?)Project.Description ?? DBNull.Value);
-            command.Parameters.AddWithValue("@userCreatedId", Project.UserCreatedId);
-            command.Parameters.AddWithValue("@createdAt", Project.CreatedAt);
-            command.Parameters.AddWithValue("@updatedAt", Project.UpdatedAt);
-            command.Parameters.AddWithValue("@status", (int)Project.Status);
-
-            await command.ExecuteNonQueryAsync();
-
-            var item = new Project_Created_Event(Project.Id, new Guid(), Project.Name, Project.Status.ToString());
-
-            await _eventBus.PublishAsync(item);
+            await connection.ExecuteAsync(sql, new
+            {
+                Project.Id,
+                Project.Name,
+                Project.Description,
+                Project.UserCreatedId,
+                Project.CreatedAt,
+                Project.UpdatedAt,
+                Status = (int)Project.Status
+            });
         }
 
         public async Task UpdateAsync(Domain.Entities.Project Project)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            using var connection = await _connectionFactory.CreateOpenConnectionAsync();
 
-            var command = new NpgsqlCommand(@"
+            const string sql = @"
                 UPDATE ""Project""
-                SET ""Name"" = @name,
-                    ""Description"" = @description,
-                    ""Status"" = @status,
-                    ""UpdatedAt"" = @updatedAt
-                WHERE ""Id"" = @id", connection);
+                SET ""Name"" = @Name,
+                    ""Description"" = @Description,
+                    ""Status"" = @Status,
+                    ""UpdatedAt"" = @UpdatedAt
+                WHERE ""Id"" = @Id";
 
-            command.Parameters.AddWithValue("@id", Project.Id);
-            command.Parameters.AddWithValue("@name", Project.Name);
-            command.Parameters.AddWithValue("@description", (object?)Project.Description ?? DBNull.Value);
-            command.Parameters.AddWithValue("@updatedAt", Project.UpdatedAt);
-            command.Parameters.AddWithValue("@status", (int)Project.Status);
-
-            await command.ExecuteNonQueryAsync();
+            await connection.ExecuteAsync(sql, new
+            {
+                Project.Id,
+                Project.Name,
+                Project.Description,
+                Project.UpdatedAt,
+                Status = (int)Project.Status
+            });
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            using var connection = await _connectionFactory.CreateOpenConnectionAsync();
 
-            var command = new NpgsqlCommand(@"
+            const string sql = @"
                 UPDATE ""Project""
-                SET ""DeletedAt"" = @deletedAt
-                WHERE ""Id"" = @id", connection);
+                SET ""DeletedAt"" = @DeletedAt
+                WHERE ""Id"" = @Id";
 
-            command.Parameters.AddWithValue("@id", id);
-            command.Parameters.AddWithValue("@deletedAt", DateTime.UtcNow);
-
-            await command.ExecuteNonQueryAsync();
-        }
-
-        private Domain.Entities.Project MapProject(NpgsqlDataReader reader)
-        {
-            return new Domain.Entities.Project
+            await connection.ExecuteAsync(sql, new
             {
-                Id = reader.GetGuid(reader.GetOrdinal("Id")),
-                Name = reader.GetString(reader.GetOrdinal("Name")),
-                Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
-                UserCreatedId = reader.GetGuid(reader.GetOrdinal("UserCreatedId")),
-                Status = (Market.Domain.Enums.StatusEnum)reader.GetInt32(reader.GetOrdinal("Status")),
-                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
-                UpdatedAt = reader.GetDateTime(reader.GetOrdinal("UpdatedAt"))
-                // Members: não populado aqui, depende de join ou consulta separada
-            };
+                Id = id,
+                DeletedAt = DateTime.UtcNow
+            });
         }
     }
 }

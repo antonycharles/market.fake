@@ -7,7 +7,7 @@ namespace Market.Domain.Interfaces
 {
     public interface IProjectRepository
     {
-        Task<Entities.Project> GetByIdAsync(Guid id);
+        Task<Entities.Project?> GetByIdAsync(Guid id);
         Task<IEnumerable<Entities.Project>> GetAllAsync();
         Task AddAsync(Entities.Project Project);
         Task UpdateAsync(Entities.Project Project);

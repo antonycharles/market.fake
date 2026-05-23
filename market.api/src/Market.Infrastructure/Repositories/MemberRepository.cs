@@ -1,117 +1,79 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Npgsql;
+using Dapper;
 using Market.Domain.Entities;
-using Market.Domain.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Market.Domain.Enums;
-using Market.Domain.Settings;
-using Microsoft.Extensions.Options;
+using Market.Domain.Interfaces;
+using Market.Infrastructure.Data;
 
 namespace Market.Infrastructure.Repositories
 {
     public class MemberRepository : IMemberRepository
     {
-        private readonly string _connectionString;
+        private readonly IDbConnectionFactory _connectionFactory;
 
-        public MemberRepository(IOptions<ProjectSettings> options)
+        public MemberRepository(IDbConnectionFactory connectionFactory)
         {
-            _connectionString = options.Value.ConnectionString;
+            _connectionFactory = connectionFactory;
         }
 
-        public async Task<Member> GetByIdAsync(Guid id)
+        public async Task<Member?> GetByIdAsync(Guid id)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            using var connection = await _connectionFactory.CreateOpenConnectionAsync();
 
-            var command = new NpgsqlCommand(@"
+            const string sql = @"
                 SELECT ""Id"", ""UserId"", ""ProjectId"", ""CreatedAt"", ""UpdatedAt"", ""Status""
                 FROM ""Member""
-                WHERE ""Id"" = @id AND ""DeletedAt"" IS NULL", connection);
+                WHERE ""Id"" = @Id AND ""DeletedAt"" IS NULL";
 
-            command.Parameters.AddWithValue("@id", id);
-
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            {
-                return MapMember(reader);
-            }
-
-            return null;
+            return await connection.QueryFirstOrDefaultAsync<Member>(sql, new { Id = id });
         }
 
         public async Task<IEnumerable<Member>> GetByProjectIdAsync(Guid projectId)
         {
-            var members = new List<Member>();
+            using var connection = await _connectionFactory.CreateOpenConnectionAsync();
 
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            var command = new NpgsqlCommand(@"
+            const string sql = @"
                 SELECT ""Id"", ""UserId"", ""ProjectId"", ""CreatedAt"", ""UpdatedAt"", ""Status""
                 FROM ""Member""
-                WHERE ""ProjectId"" = @projectId AND ""DeletedAt"" IS NULL", connection);
+                WHERE ""ProjectId"" = @ProjectId AND ""DeletedAt"" IS NULL";
 
-            command.Parameters.AddWithValue("@projectId", projectId);
-
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                members.Add(MapMember(reader));
-            }
-
-            return members;
+            return await connection.QueryAsync<Member>(sql, new { ProjectId = projectId });
         }
 
         public async Task AddAsync(Member member)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            using var connection = await _connectionFactory.CreateOpenConnectionAsync();
 
-            var command = new NpgsqlCommand(@"
+            const string sql = @"
                 INSERT INTO ""Member"" 
                 (""Id"", ""UserId"", ""ProjectId"", ""CreatedAt"", ""UpdatedAt"", ""Status"")
                 VALUES
-                (@id, @userId, @projectId, @createdAt, @updatedAt, @status)", connection);
+                (@Id, @UserId, @ProjectId, @CreatedAt, @UpdatedAt, @Status)";
 
-            command.Parameters.AddWithValue("@id", member.Id);
-            command.Parameters.AddWithValue("@userId", member.UserId);
-            command.Parameters.AddWithValue("@projectId", member.ProjectId);
-            command.Parameters.AddWithValue("@createdAt", member.CreatedAt);
-            command.Parameters.AddWithValue("@updatedAt", member.UpdatedAt);
-            command.Parameters.AddWithValue("@status", (int)StatusEnum.Active);
-
-            await command.ExecuteNonQueryAsync();
+            await connection.ExecuteAsync(sql, new
+            {
+                member.Id,
+                member.UserId,
+                member.ProjectId,
+                member.CreatedAt,
+                member.UpdatedAt,
+                Status = (int)StatusEnum.Active
+            });
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            using var connection = await _connectionFactory.CreateOpenConnectionAsync();
 
-            var command = new NpgsqlCommand(@"
+            const string sql = @"
                 UPDATE ""Member""
-                SET ""DeletedAt"" = @deletedAt
-                WHERE ""Id"" = @id", connection);
+                SET ""DeletedAt"" = @DeletedAt
+                WHERE ""Id"" = @Id";
 
-            command.Parameters.AddWithValue("@id", id);
-            command.Parameters.AddWithValue("@deletedAt", DateTime.UtcNow);
-
-            await command.ExecuteNonQueryAsync();
-        }
-
-        private Member MapMember(NpgsqlDataReader reader)
-        {
-            return new Member
+            await connection.ExecuteAsync(sql, new
             {
-                Id = reader.GetGuid(reader.GetOrdinal("Id")),
-                UserId = reader.GetGuid(reader.GetOrdinal("UserId")),
-                ProjectId = reader.GetGuid(reader.GetOrdinal("ProjectId")),
-                CreatedAt = reader.GetDateTime(reader.GetOrdinal("CreatedAt")),
-                UpdatedAt = reader.GetDateTime(reader.GetOrdinal("UpdatedAt")),
-                Status = (StatusEnum)reader.GetInt32(reader.GetOrdinal("Status"))
-            };
+                Id = id,
+                DeletedAt = DateTime.UtcNow
+            });
         }
     }
 }
