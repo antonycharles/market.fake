@@ -1,0 +1,108 @@
+﻿@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Authorization
+@using Market.Web.Extensions
+@using System.Security.Claims
+
+@inject IConfiguration Config
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager Nav
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+<div class="top-row p-0 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">
+            <h4 class="fw-bold d-flex align-items-center m-0">
+                <img src="@Config["FileApiUrlPublic"]/imgs/icone-project-sync-purple.png"
+                            alt=""
+                            style="max-width:30px;">
+                <span class="title-logo">Market.Web</span>
+            </h4>
+        </a>
+         <div class="d-flex justify-content-end align-items-center" style="height:auto;">
+            <div class="">
+                <a class="nav-link  text-decoration-none dropdown-toggle d-flex align-items-center"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+
+                    <figure class="user-image me-3"
+                            style="
+                                width:50px;
+                                height:50px;
+                                border-radius:50%;
+                                background-size:cover;
+                                background-position:center;
+                                background-color:#6c757d;
+                                background-image: @(HasUserImageUrl 
+                                    ? $"url('{UserImage}')" 
+                                    : "none");
+                                margin:0;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                color:white;
+                                font-weight:bold;
+                            ">
+                        @if (!HasUserImageUrl)
+                        {
+                            @UserImage
+                        }
+                    </figure>
+
+                    <div class="text-dark text-start lh-sm">
+                        <b>@User.GetName()</b><br />
+                        <small class="text-muted">@User.GetEmail()</small>
+                    </div>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <button class="dropdown-item" @onclick="Logout">
+                            Exit
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid pt-1 pb-1">
+    <div class="@NavMenuCssClass d-flex justify-content-between align-items-center" @onclick="ToggleNavMenu">
+        <div>
+        </div>
+        <nav class="flex-column"> 
+            <div class="nav-item ">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Projects
+                </NavLink>
+            </div>
+        </nav>
+    </div>
+</div>
+@code {
+    private bool collapseNavMenu = true;
+    private ClaimsPrincipal? User;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string UserImage => User.GetImage();
+    private bool HasUserImageUrl => UserImage.Length > 5;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        User = user;
+    }
+    private async Task Logout()
+    {
+        await LocalStorage.RemoveItemAsync("jwt");
+        Nav.NavigateTo(Config["LoginWebUrl"], true);
+    }
+}

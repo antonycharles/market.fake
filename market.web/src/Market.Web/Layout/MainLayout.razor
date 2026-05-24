@@ -1,0 +1,39 @@
+﻿@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using Market.Web.Extensions
+@inherits LayoutComponentBase
+@inject IConfiguration Config
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+       
+
+        <article class="content p-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private ClaimsPrincipal? User;
+    private async Task Logout()
+    {
+        await LocalStorage.RemoveItemAsync("jwt");
+        Nav.NavigateTo(Config["LoginWebUrl"] + "/", true);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        User = user;
+    }
+}

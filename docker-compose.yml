@@ -12,7 +12,7 @@ services:
             - db_postgresql:/var/lib/postgresql/data
         container_name: dbpostgresql
         networks:
-            - project-network
+            - market-network
         ports:
             - "5432:5432"
         environment:
@@ -25,7 +25,7 @@ services:
             - "5672:5672"
             - "15672:15672"
         networks:
-            - project-network
+            - market-network
         volumes:
             - rabbitmq_data:/var/lib/rabbitmq
             - ./infra/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
@@ -40,7 +40,7 @@ services:
                     cpus: '0.50'
                     memory: 50M
         networks:
-            - project-network
+            - market-network
         ports:
             - '6379:6379'
         volumes: 
@@ -53,7 +53,7 @@ services:
         - "1025:1025" # SMTP
         - "8025:8025" # Web UI
         networks:
-            - project-network
+            - market-network
 
     userapi:
         build:
@@ -63,7 +63,7 @@ services:
         ports:
             - "9500:8080"
         networks: 
-            - project-network
+            - market-network
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
         depends_on:
@@ -79,7 +79,7 @@ services:
         ports:
             - "9501:8080"
         networks: 
-            - project-network
+            - market-network
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
         depends_on:
@@ -95,7 +95,7 @@ services:
         ports:
             - "9502:8080"
         networks: 
-            - project-network
+            - market-network
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
         volumes:
@@ -115,7 +115,7 @@ services:
         ports:
             - "9503:8080"
         networks: 
-            - project-network
+            - market-network
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
         volumes:
@@ -133,7 +133,7 @@ services:
         ports:
             - "9001:8080"
         networks: 
-            - project-network
+            - market-network
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
         depends_on:
@@ -150,7 +150,7 @@ services:
         ports:
             - "9002:8080"
         networks: 
-            - project-network
+            - market-network
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
         depends_on:
@@ -158,15 +158,15 @@ services:
             - message.broker.rabbitmq
             - redis
             - accountsloginweb
-    projectweb:
+    marketweb:
         build:
-            context: ./project.web
+            context: ./market.web
             dockerfile: Dockerfile
-        container_name: project.web
+        container_name: market.web
         ports:
             - "9003:80"
         networks: 
-            - project-network
+            - market-network
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
         depends_on:
@@ -178,7 +178,7 @@ services:
         ports:
             - "80:80"
         networks:
-            - project-network
+            - market-network
         volumes:
             - ./infra/nginx:/etc/nginx/conf.d:ro
         depends_on:
@@ -188,7 +188,7 @@ services:
             - marketapi
             - accountsloginweb
             - accountsmanagementweb
-            - projectweb
+            - marketweb
 volumes:
     cache:
         driver: local
@@ -200,5 +200,5 @@ volumes:
         driver: local
         
 networks:
-  project-network:
+  market-network:
     driver: bridge
