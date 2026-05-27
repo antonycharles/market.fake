@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Market.Web;
 using Market.Web.Providers;
-using Market.Web.Services;
+using Market.Infraestruture.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -33,6 +33,8 @@ builder.Services.AddScoped<LoginWebService>();
 
 builder.Services.AddScoped<ProjectService>();
 builder.Services.AddScoped<MemberService>();
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<ProductService>();
 
 
 await builder.Build().RunAsync();

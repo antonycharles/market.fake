@@ -1,0 +1,99 @@
+@page "/products"
+@using Microsoft.AspNetCore.Authorization
+@implements IAsyncDisposable
+@inject ProductService ProductService
+@inject IJSRuntime JS
+
+@attribute [Authorize]
+
+<PageTitle>Products</PageTitle>
+
+<div class=" container products-page">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="mb-1">Products</h3>
+            <p class="text-muted mb-0">Browse products with scroll pagination.</p>
+        </div>
+    </div>
+
+    @if (products.Count == 0 && isLoading)
+    {
+        <p class="text-muted">Loading products...</p>
+    }
+    else
+    {
+        <div class="products-grid">
+            @foreach (var product in products)
+            {
+                <ProductCard Product="product" />
+            }
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="products-loading text-muted">Loading more products...</div>
+        }
+        else if (!hasMore)
+        {
+            <div class="products-loading text-muted">No more products.</div>
+        }
+    }
+</div>
+
+@code {
+    private const int PageSize = 8;
+    private readonly List<ProductDto> products = new();
+    private DotNetObjectReference<List>? dotNetRef;
+    private IJSObjectReference? scrollModule;
+    private int pageIndex;
+    private bool hasMore = true;
+    private bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNextPageAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dotNetRef = DotNetObjectReference.Create(this);
+            scrollModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/scrollPagination.js");
+            await scrollModule.InvokeVoidAsync("registerScrollPagination", dotNetRef);
+        }
+    }
+
+    [JSInvokable]
+    public async Task LoadMoreOnScroll()
+    {
+        await LoadNextPageAsync();
+    }
+
+    private async Task LoadNextPageAsync()
+    {
+        if (isLoading || !hasMore)
+        {
+            return;
+        }
+
+        isLoading = true;
+        var nextProducts = await ProductService.GetPagedAsync(pageIndex, PageSize);
+        products.AddRange(nextProducts);
+        pageIndex++;
+        hasMore = nextProducts.Count == PageSize;
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (scrollModule is not null)
+        {
+            await scrollModule.InvokeVoidAsync("unregisterScrollPagination");
+            await scrollModule.DisposeAsync();
+        }
+
+        dotNetRef?.Dispose();
+    }
+}

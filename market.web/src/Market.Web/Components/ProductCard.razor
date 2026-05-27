@@ -1,0 +1,38 @@
+@using System.Globalization
+
+<article class="product-card">
+    <a class="product-card__media" href="@ProductUrl" aria-label="@($"View {Product.Name}")">
+        <img src="@ImageUrl" alt="@Product.Name" />
+    </a>
+    <div class="product-card__body">
+        <div>
+            <h5>@Product.Name</h5>
+            <p>@Product.Description</p>
+        </div>
+        <div class="product-card__footer">
+            <strong>@FormatCurrency(Product.Price)</strong>
+            <a class="btn btn-outline-primary btn-sm" href="@ProductUrl">Details</a>
+        </div>
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProductDto Product { get; set; } = default!;
+
+    private string ProductUrl => $"products/{Product.Id}";
+
+    private string ImageUrl
+    {
+        get
+        {
+            var image = Product.Images?.FirstOrDefault(img => img.IsMain) ?? Product.Images?.FirstOrDefault();
+            return image?.Url ?? "https://placehold.co/640x460/e5e7eb/475569?text=Product";
+        }
+    }
+
+    private static string FormatCurrency(decimal value)
+    {
+        return value.ToString("C", CultureInfo.GetCultureInfo("en-US"));
+    }
+}

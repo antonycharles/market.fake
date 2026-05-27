@@ -65,6 +65,69 @@ code {
     color: #c02d76;
 }
 
+.home-banner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+    gap: 2rem;
+    align-items: center;
+    min-height: 360px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f8fafc 0%, #eef6f1 48%, #f5efe3 100%);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.home-banner__content {
+    max-width: 560px;
+}
+
+.home-banner__eyebrow {
+    color: #2563eb;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.home-banner h1 {
+    color: #172033;
+    font-size: 2.75rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+}
+
+.home-banner__copy {
+    color: #4b5563;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.home-banner__gallery {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    grid-template-rows: repeat(2, minmax(120px, 1fr));
+    gap: 0.9rem;
+    min-height: 290px;
+}
+
+.home-banner__gallery img {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.12);
+}
+
+.home-banner__gallery img:first-child {
+    grid-row: 1 / span 2;
+}
+
 .project-card {
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -88,4 +151,35 @@ code {
 
 .project-card .card-text {
     line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+    .home-banner {
+        grid-template-columns: 1fr;
+        padding: 2rem;
+    }
+
+    .home-banner h1 {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .home-banner {
+        padding: 1.25rem;
+    }
+
+    .home-banner h1 {
+        font-size: 1.8rem;
+    }
+
+    .home-banner__gallery {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, 160px);
+        min-height: auto;
+    }
+
+    .home-banner__gallery img:first-child {
+        grid-row: auto;
+    }
 }

@@ -9,7 +9,7 @@ main {
 }
 
 .sidebar {
-    background-color: var(--color-market-api);
+    background-color: var(--color-primary);
 }
 
 .top-row {

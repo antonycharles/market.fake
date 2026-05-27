@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using Market.Web.Responses;
+using Market.Infraestruture.Responses;
 
 namespace Market.Web.Providers
 {

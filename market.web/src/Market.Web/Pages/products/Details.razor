@@ -1,0 +1,94 @@
+@page "/products/{ProductId:guid}"
+@using System.Globalization
+@using Microsoft.AspNetCore.Authorization
+@inject ProductService ProductService
+
+@attribute [Authorize]
+
+<PageTitle>@(product?.Name ?? "Product Details")</PageTitle>
+
+<div class="container product-details">
+    <a class="product-details__back" href="products">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+        <span>Back to products</span>
+    </a>
+
+    @if (isLoading)
+    {
+        <p class="text-muted">Loading product...</p>
+    }
+    else if (product is null)
+    {
+        <div class="alert alert-warning mb-0">
+            Product not found.
+        </div>
+    }
+    else
+    {
+        <section class="product-details__layout">
+            <div class="product-details__media">
+                <img src="@ImageUrl" alt="@product.Name" />
+            </div>
+
+            <div class="product-details__panel">
+                <p class="product-details__eyebrow">Product</p>
+                <h1>@product.Name</h1>
+                <p class="product-details__description">@product.Description</p>
+                <strong class="product-details__price">@FormatCurrency(product.Price)</strong>
+
+                <div class="product-details__quantity">
+                    <label for="product-quantity" class="form-label">Quantity</label>
+                    <select id="product-quantity" class="form-select" @bind="selectedQuantity">
+                        @foreach (var quantity in Quantities)
+                        {
+                            <option value="@quantity">@quantity</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary">
+                        <i class="bi bi-cart-plus" aria-hidden="true"></i>
+                        Add to cart
+                    </button>
+                    <a class="btn btn-outline-secondary" href="products">Continue shopping</a>
+                </div>
+
+                <div class="product-details__meta">
+                    <div><strong>Product ID:</strong> @product.Id</div>
+                </div>
+            </div>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid ProductId { get; set; }
+
+    private ProductDto? product;
+    private bool isLoading = true;
+    private int selectedQuantity = 1;
+    private static readonly int[] Quantities = Enumerable.Range(1, 10).ToArray();
+
+    private string ImageUrl
+    {
+        get
+        {
+            var image = product?.Images?.FirstOrDefault(img => img.IsMain) ?? product?.Images?.FirstOrDefault();
+            return image?.Url ?? "https://placehold.co/640x460/e5e7eb/475569?text=Product";
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        isLoading = true;
+        product = await ProductService.GetByIdAsync(ProductId);
+        isLoading = false;
+    }
+
+    private static string FormatCurrency(decimal value)
+    {
+        return value.ToString("C", CultureInfo.GetCultureInfo("en-US"));
+    }
+}

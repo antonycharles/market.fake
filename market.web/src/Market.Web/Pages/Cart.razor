@@ -1,0 +1,165 @@
+@page "/cart"
+@using System.Globalization
+
+<PageTitle>Cart</PageTitle>
+
+<div class="cart-page">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="mb-1">Cart</h3>
+            <p class="text-muted mb-0">Review your items before checkout.</p>
+        </div>
+    </div>
+
+    <div class="cart-layout">
+        <section class="cart-items" aria-label="Cart items">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-end">Total</th>
+                            <th class="text-end"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="cart-product">
+                                        <img src="@item.ImageUrl" alt="@item.Name" />
+                                        <div>
+                                            <strong>@item.Name</strong>
+                                            <div class="text-muted small">@item.Description</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cart-quantity" aria-label="@($"{item.Name} quantity")">
+                                        <button type="button"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                @onclick="() => DecreaseQuantity(item)"
+                                                disabled="@(item.Quantity <= 1)">
+                                            -
+                                        </button>
+                                        <span>@item.Quantity</span>
+                                        <button type="button"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                @onclick="() => IncreaseQuantity(item)">
+                                            +
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="text-end fw-semibold">@FormatCurrency(item.Total)</td>
+                                <td class="text-end">
+                                    <button type="button"
+                                            class="btn btn-danger btn-sm cart-remove"
+                                            title="Remove product"
+                                            aria-label="@($"Remove {item.Name}")"
+                                            @onclick="() => RemoveItem(item)">
+                                        <i class="bi bi-trash text-white" aria-hidden="true"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <aside class="cart-summary" aria-label="Cart summary">
+            <h5>Order Summary</h5>
+            <div class="cart-summary__row">
+                <span>Items</span>
+                <strong>@Items.Sum(item => item.Quantity)</strong>
+            </div>
+            <div class="cart-summary__row">
+                <span>Subtotal</span>
+                <strong>@FormatCurrency(Subtotal)</strong>
+            </div>
+            <div class="cart-summary__row">
+                <span>Shipping</span>
+                <strong>@FormatCurrency(Shipping)</strong>
+            </div>
+            <div class="cart-summary__total">
+                <span>Total</span>
+                <strong>@FormatCurrency(Total)</strong>
+            </div>
+            <button type="button" class="btn btn-success w-100" disabled="@(Items.Count == 0)">
+                Finalizar compra
+            </button>
+        </aside>
+    </div>
+</div>
+
+@code {
+    private readonly List<CartItem> Items = new()
+    {
+        new CartItem(
+            "Wireless Headphones",
+            "Noise cancelling audio",
+            2,
+            89.90m,
+            "https://placehold.co/96x96/e8f1ff/2454a6?text=Audio"),
+        new CartItem(
+            "Smart Watch",
+            "Daily activity tracker",
+            1,
+            149.50m,
+            "https://placehold.co/96x96/eaf7ef/24734a?text=Watch"),
+        new CartItem(
+            "Portable Charger",
+            "USB-C fast charging",
+            3,
+            34.75m,
+            "https://placehold.co/96x96/f3efe6/7a5a20?text=Power")
+    };
+
+    private decimal Subtotal => Items.Sum(item => item.Total);
+    private decimal Shipping => Items.Count == 0 ? 0 : 12.90m;
+    private decimal Total => Subtotal + Shipping;
+
+    private static void IncreaseQuantity(CartItem item)
+    {
+        item.Quantity++;
+    }
+
+    private static void DecreaseQuantity(CartItem item)
+    {
+        if (item.Quantity > 1)
+        {
+            item.Quantity--;
+        }
+    }
+
+    private void RemoveItem(CartItem item)
+    {
+        Items.Remove(item);
+    }
+
+    private static string FormatCurrency(decimal value)
+    {
+        return value.ToString("C", CultureInfo.GetCultureInfo("en-US"));
+    }
+
+    private sealed class CartItem
+    {
+        public CartItem(string name, string description, int quantity, decimal unitPrice, string imageUrl)
+        {
+            Name = name;
+            Description = description;
+            Quantity = quantity;
+            UnitPrice = unitPrice;
+            ImageUrl = imageUrl;
+        }
+
+        public string Name { get; }
+        public string Description { get; }
+        public int Quantity { get; set; }
+        public decimal UnitPrice { get; }
+        public string ImageUrl { get; }
+        public decimal Total => Quantity * UnitPrice;
+    }
+}

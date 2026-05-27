@@ -2,8 +2,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["src/Market.Web/Market.Web.csproj", "Market.Web/"]
+COPY ["src/Market.Infraestruture/Market.Infraestruture.csproj", "Market.Infraestruture/"]
 RUN dotnet restore "Market.Web/Market.Web.csproj"
 COPY src/Market.Web/. Market.Web/
+COPY src/Market.Infraestruture/. Market.Infraestruture/
 WORKDIR "/src/Market.Web"
 RUN dotnet build "Market.Web.csproj" -c Release -o /app/build
 

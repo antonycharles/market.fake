@@ -1,1 +1,63 @@
-﻿<PageTitle>Projects</PageTitle>
+﻿@page "/"
+@inject ProductService ProductService
+
+<PageTitle>Market.Fake</PageTitle>
+
+<section class="home-banner">
+    <div class="home-banner__content">
+        <p class="home-banner__eyebrow">Market.Fake</p>
+        <h1>Find products for every project</h1>
+        <p class="home-banner__copy">
+            Explore categories, compare products, and keep your marketplace organized in one place.
+        </p>
+        <a class="btn btn-primary" href="categories">View Categories</a>
+    </div>
+
+    <div class="home-banner__gallery" aria-label="Product preview links">
+        <a class="home-banner__tile" href="products" aria-label="Open products">
+            <img src="https://placehold.co/520x360/e8f1ff/2454a6?text=Products"
+                 alt="Products placeholder" />
+        </a>
+        <a class="home-banner__tile" href="categories" aria-label="Open categories">
+            <img src="https://placehold.co/360x260/f3efe6/7a5a20?text=Categories"
+                 alt="Categories placeholder" />
+        </a>
+        <a class="home-banner__tile" href="products" aria-label="Open offers">
+            <img src="https://placehold.co/360x260/eaf7ef/24734a?text=Offers"
+                 alt="Offers placeholder" />
+        </a>
+    </div>
+</section>
+
+<section class="container home-products" aria-labelledby="featured-products-title">
+    <div class="home-products__header">
+        <div>
+            <p class="home-products__eyebrow">Featured</p>
+            <h2 id="featured-products-title">Products</h2>
+        </div>
+        <a class="btn btn-outline-primary btn-sm" href="products">View all</a>
+    </div>
+
+    @if (Products is null)
+    {
+        <p class="text-muted">Loading products...</p>
+    }
+    else
+    {
+        <div class="home-products__grid">
+            @foreach (var product in Products)
+            {
+                <ProductCard Product="product" />
+            }
+        </div>
+    }
+</section>
+
+@code {
+    private List<ProductDto>? Products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Products = await ProductService.GetFeaturedAsync();
+    }
+}
