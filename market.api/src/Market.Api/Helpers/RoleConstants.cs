@@ -14,16 +14,64 @@ namespace Market.Api.Helpers
         protected const string delete = "delete";
 
 
-        public class MemberRole{
-            private const string prefix = "member";
+        public class StoreRole{
+            private const string prefix = "stores";
             public const string List = $"{code}-{prefix}-{list}";
             public const string Create = $"{code}-{prefix}-{create}";
             public const string Update = $"{code}-{prefix}-{update}";
             public const string Delete = $"{code}-{prefix}-{delete}";
         }
 
-        public class ProjectRole{
-            private const string prefix = "project";
+        public class CategoryRole{
+            private const string prefix = "categories";
+            public const string List = $"{code}-{prefix}-{list}";
+            public const string Create = $"{code}-{prefix}-{create}";
+            public const string Update = $"{code}-{prefix}-{update}";
+            public const string Delete = $"{code}-{prefix}-{delete}";
+        }
+
+        public class ProductRole{
+            private const string prefix = "products";
+            public const string List = $"{code}-{prefix}-{list}";
+            public const string Create = $"{code}-{prefix}-{create}";
+            public const string Update = $"{code}-{prefix}-{update}";
+            public const string Delete = $"{code}-{prefix}-{delete}";
+        }
+
+        public class ProductStockRole{
+            private const string prefix = "product-stocks";
+            public const string List = $"{code}-{prefix}-{list}";
+            public const string Create = $"{code}-{prefix}-{create}";
+            public const string Update = $"{code}-{prefix}-{update}";
+            public const string Delete = $"{code}-{prefix}-{delete}";
+        }
+
+        public class ProductPriceRole{
+            private const string prefix = "product-prices";
+            public const string List = $"{code}-{prefix}-{list}";
+            public const string Create = $"{code}-{prefix}-{create}";
+            public const string Update = $"{code}-{prefix}-{update}";
+            public const string Delete = $"{code}-{prefix}-{delete}";
+        }
+
+        public class ProductPhotoRole{
+            private const string prefix = "product-photos";
+            public const string List = $"{code}-{prefix}-{list}";
+            public const string Create = $"{code}-{prefix}-{create}";
+            public const string Update = $"{code}-{prefix}-{update}";
+            public const string Delete = $"{code}-{prefix}-{delete}";
+        }
+
+        public class ProductInformationRole{
+            private const string prefix = "product-informations";
+            public const string List = $"{code}-{prefix}-{list}";
+            public const string Create = $"{code}-{prefix}-{create}";
+            public const string Update = $"{code}-{prefix}-{update}";
+            public const string Delete = $"{code}-{prefix}-{delete}";
+        }
+
+        public class ProductCategoryRole{
+            private const string prefix = "product-categories";
             public const string List = $"{code}-{prefix}-{list}";
             public const string Create = $"{code}-{prefix}-{create}";
             public const string Update = $"{code}-{prefix}-{update}";

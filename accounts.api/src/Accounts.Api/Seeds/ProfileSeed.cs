@@ -116,6 +116,7 @@ namespace Accounts.Api.Seeds
             var profiles = new List<Profile>();
 
             profiles.Add(new Profile { Name = "User", AppId = app.Id, Slug = "user", IsDefault = true });
+            profiles.Add(new Profile { Name = "Admin", AppId = app.Id, Slug = "admin", IsDefault = false });
 
             var profilesDb = context.Profiles.AsNoTracking().Where(w => w.AppId == app.Id).ToList();
 

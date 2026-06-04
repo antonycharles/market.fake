@@ -18,12 +18,12 @@ namespace Accounts.Api.Seeds
             SeederAccountsManagementAdmin(context);
             SeederAccountsManagementUser(context);
             SeederAccountsApiPublicToken(context);
-            SeederMarketApiUser(context);
+            SeederMarketApiAdmin(context);
 
             context.SaveChanges();
         }
 
-        private static void SeederMarketApiUser(AccountsContext context)
+        private static void SeederMarketApiAdmin(AccountsContext context)
         {
             var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "market-api");
 
@@ -31,7 +31,7 @@ namespace Accounts.Api.Seeds
                 return;
 
             var profile = context.Profiles.AsNoTracking()
-                .FirstOrDefault(w => w.Slug == "user" && w.AppId == app.Id);
+                .FirstOrDefault(w => w.Slug == "admin" && w.AppId == app.Id);
 
             if(profile == null)
                 return;

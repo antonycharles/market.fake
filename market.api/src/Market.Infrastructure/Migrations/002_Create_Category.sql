@@ -1,0 +1,14 @@
+CREATE TABLE "Category" (
+    "Id" UUID PRIMARY KEY,
+    "CreatedAt" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    "DeletedAt" TIMESTAMP WITHOUT TIME ZONE NULL,
+    "Name" VARCHAR(255) NOT NULL,
+    "Slug" VARCHAR(255) NOT NULL,
+    "Description" TEXT NULL,
+    "Status" INT NOT NULL
+);
+
+CREATE UNIQUE INDEX "UX_Category_Slug_Active"
+ON "Category" (LOWER("Slug"))
+WHERE "DeletedAt" IS NULL;

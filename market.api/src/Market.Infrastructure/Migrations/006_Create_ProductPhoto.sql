@@ -1,0 +1,17 @@
+CREATE TABLE "ProductPhoto" (
+    "Id" UUID PRIMARY KEY,
+    "CreatedAt" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    "DeletedAt" TIMESTAMP WITHOUT TIME ZONE NULL,
+    "ProductId" UUID NOT NULL,
+    "FileId" VARCHAR(255) NOT NULL,
+    "Url" TEXT NOT NULL,
+    "Description" TEXT NULL,
+    "Order" INT NOT NULL DEFAULT 0,
+    "Type" INT NOT NULL,
+    "Status" INT NOT NULL
+);
+
+ALTER TABLE "ProductPhoto"
+ADD CONSTRAINT "FK_ProductPhoto_Product"
+FOREIGN KEY ("ProductId") REFERENCES "Product"("Id");

@@ -80,8 +80,14 @@ namespace Accounts.Api.Seeds
                 return;
 
             var permissions = new List<Permission>();
-            BasicCRUD(context, app, permissions, "Project", "project");
-            BasicCRUD(context, app, permissions, "Member", "member");
+            BasicCRUD(context, app, permissions, "Stores", "stores");
+            BasicCRUD(context, app, permissions, "Categories", "categories");
+            BasicCRUD(context, app, permissions, "Products", "products");
+            BasicCRUD(context, app, permissions, "Product Stocks", "product-stocks");
+            BasicCRUD(context, app, permissions, "Product Prices", "product-prices");
+            BasicCRUD(context, app, permissions, "Product Photos", "product-photos");
+            BasicCRUD(context, app, permissions, "Product Informations", "product-informations");
+            BasicCRUD(context, app, permissions, "Product Categories", "product-categories");
 
             var permissionsDb = context.Permissions.AsNoTracking().ToList();
 

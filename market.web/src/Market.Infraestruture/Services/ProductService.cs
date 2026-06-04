@@ -50,7 +50,7 @@ namespace Market.Infraestruture.Services
                         new ImageDto
                         {
                             Id = Guid.Parse("ef290f2b-9f46-4f2d-9c2d-8ec02df2658c"),
-                            Url = "https://placehold.co/640x460/e8f1ff/2454a6?text=Headphones",
+                            Url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/2.png",
                             IsMain = true
                         }
                     }
@@ -66,7 +66,7 @@ namespace Market.Infraestruture.Services
                         new ImageDto
                         {
                             Id = Guid.Parse("b12bfafc-b917-4716-a42b-cbf67b9304f8"),
-                            Url = "https://placehold.co/640x460/eaf7ef/24734a?text=Smart+Watch",
+                            Url = "https://digi-api.com/images/digimon/w/Gomamon.png",
                             IsMain = true
                         }
                     }

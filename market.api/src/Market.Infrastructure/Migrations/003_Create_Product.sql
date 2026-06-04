@@ -1,0 +1,21 @@
+CREATE TABLE "Product" (
+    "Id" UUID PRIMARY KEY,
+    "CreatedAt" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    "UpdatedAt" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    "DeletedAt" TIMESTAMP WITHOUT TIME ZONE NULL,
+    "StoreId" UUID NOT NULL,
+    "Name" VARCHAR(255) NOT NULL,
+    "Code" INT NOT NULL,
+    "Slug" VARCHAR(255) NOT NULL,
+    "Summary" TEXT NULL,
+    "Description" TEXT NULL,
+    "Status" INT NOT NULL
+);
+
+ALTER TABLE "Product"
+ADD CONSTRAINT "FK_Product_Store"
+FOREIGN KEY ("StoreId") REFERENCES "Store"("Id");
+
+CREATE UNIQUE INDEX "UX_Product_Code_Active"
+ON "Product" ("Code")
+WHERE "DeletedAt" IS NULL;
