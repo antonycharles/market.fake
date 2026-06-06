@@ -12,6 +12,7 @@ using Messaging.Contracts.Events;
 using Messaging.RabbitMQ;
 using Market.Infrastructure.Repositories.Externals;
 using Market.Domain.Interfaces.Externals;
+using Market.Api.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +49,7 @@ builder.Services.AddScoped<IProductPhotoService, ProductPhotoService>();
 builder.Services.AddScoped<IProductInformationService, ProductInformationService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<IErrorLogService, ErrorLogService>();
+builder.Services.AddScoped<PokemonProductSeeder>();
 
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
@@ -117,6 +119,12 @@ var runner = new MigrationRunner(
 );
 
 await runner.RunAsync();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<PokemonProductSeeder>();
+    await seeder.SeedAsync();
+}
 
 if (app.Environment.IsDevelopment())
 {
