@@ -7,8 +7,18 @@ namespace Market.Application.Services
 {
     public class ProductCategoryService : CrudService<ProductCategory, ProductCategoryDto, ProductCategoryCreateDto, ProductCategoryUpdateDto>, IProductCategoryService
     {
+        private readonly IProductCategoryRepository _repository;
+
         public ProductCategoryService(IProductCategoryRepository repository) : base(repository, "ProductCategory")
         {
+            _repository = repository;
+        }
+
+        public async Task<IEnumerable<CategoryDto>> GetCategoriesByProductIdAsync(Guid productId)
+        {
+            var categories = await _repository.GetCategoriesByProductIdAsync(productId);
+
+            return categories.Select(ToCategoryDto);
         }
 
         protected override Guid GetId(ProductCategoryUpdateDto dto) => dto.Id;
@@ -34,6 +44,17 @@ namespace Market.Application.Services
             ProductId = entity.ProductId,
             CategoryId = entity.CategoryId,
             Order = entity.Order,
+            CreatedAt = entity.CreatedAt,
+            UpdatedAt = entity.UpdatedAt,
+            Status = entity.Status
+        };
+
+        private static CategoryDto ToCategoryDto(Category entity) => new()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Slug = entity.Slug,
+            Description = entity.Description,
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,
             Status = entity.Status

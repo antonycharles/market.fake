@@ -2,8 +2,12 @@ namespace Market.Domain.Enums
 {
     public enum InformationTypeEnum
     {
-        Description = 1,
-        Specification = 2,
-        Warranty = 3
+        Abilities = 1,
+        Weight = 2,
+        Height = 3,
+        BaseExperience = 4,
+        Stats = 5,
+        Types = 6,
+        Id = 7,
     }
 }

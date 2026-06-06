@@ -19,7 +19,7 @@ public class CategoriesController : CrudController<CategoryDto, CategoryCreateDt
     public override Task<ActionResult> GetPaged([FromQuery] PaginationRequestDto request) => base.GetPaged(request);
 
     [HttpGet("{id:guid}")]
-    [AuthorizeRole(RoleConstants.CategoryRole.List)]
+    [AllowAnonymous]
     public override Task<ActionResult> GetById(Guid id) => base.GetById(id);
 
     [HttpPost]

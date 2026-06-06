@@ -1,0 +1,21 @@
+
+<article class="category-card">
+    <div class="category-card__body">
+        <div>
+            <h5>@Category.Name</h5>
+            <p>@Category.Description</p>
+        </div>
+        <div class="category-card__footer">
+            <a class="btn btn-outline-primary btn-sm" href="@ProductUrl">View products</a>
+        </div>
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public CategoryDto Category { get; set; } = default!;
+
+
+    private string ProductUrl => $"products?categoryId={Category.Id}";
+
+}

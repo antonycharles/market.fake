@@ -17,5 +17,8 @@ namespace Market.Domain.Responses
         public string? PhotoFileId { get; set; }
         public string? PhotoUrl { get; set; }
         public string? PhotoDescription { get; set; }
+        public long AvailableStock { get; set; }
+        public long ReservedStock { get; set; }
+        public long SoldStock { get; set; }
     }
 }

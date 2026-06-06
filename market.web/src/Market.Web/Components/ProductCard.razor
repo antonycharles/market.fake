@@ -10,7 +10,7 @@
             <p>@Product.Description</p>
         </div>
         <div class="product-card__footer">
-            <strong>@FormatCurrency(Product.Price)</strong>
+            <strong>@FormatCurrency(Product.Price, Product.Currency)</strong>
             <a class="btn btn-outline-primary btn-sm" href="@ProductUrl">Details</a>
         </div>
     </div>
@@ -20,7 +20,9 @@
     [Parameter, EditorRequired]
     public ProductDto Product { get; set; } = default!;
 
-    private string ProductUrl => $"products/{Product.Id}";
+    private string ProductUrl => string.IsNullOrWhiteSpace(Product.Slug)
+        ? $"products/{Product.Id}"
+        : Product.Slug;
 
     private string ImageUrl
     {
@@ -31,8 +33,13 @@
         }
     }
 
-    private static string FormatCurrency(decimal value)
+    private static string FormatCurrency(decimal value, string currency)
     {
-        return value.ToString("C", CultureInfo.GetCultureInfo("en-US"));
+        return value.ToString("C", CultureInfo.GetCultureInfo(currency switch
+        {
+            "USD" => "en-US",
+            "BRL" => "pt-BR",
+            _ => CultureInfo.InvariantCulture.Name
+        }));
     }
 }

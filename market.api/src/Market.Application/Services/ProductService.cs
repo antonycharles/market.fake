@@ -21,8 +21,8 @@ namespace Market.Application.Services
         {
             var pageIndex = NormalizePageIndex(request.PageIndex);
             var pageSize = NormalizePageSize(request.PageSize);
-            var items = await _repository.GetPagedListAsync(pageIndex, pageSize);
-            var total = await _repository.CountAsync();
+            var items = await _repository.GetPagedListAsync(pageIndex, pageSize, request.CategoryId, request.Search, request.Order);
+            var total = await _repository.CountListAsync(request.CategoryId, request.Search);
 
             return new PaginatedResponse<ProductListItemDto>(
                 items.Select(ToListItemDto).ToList(),
@@ -30,6 +30,16 @@ namespace Market.Application.Services
                 pageIndex,
                 pageSize,
                 request);
+        }
+
+        public async Task<ProductDto?> GetByCodeAsync(int code)
+        {
+            var entity = await _repository.GetByCodeAsync(code);
+
+            if (entity == null)
+                throw new BusinessException("Product not found");
+
+            return ToDto(entity);
         }
 
         protected override async Task ValidateCreateAsync(ProductCreateDto dto)

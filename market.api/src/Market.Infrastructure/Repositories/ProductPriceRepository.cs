@@ -38,5 +38,26 @@ namespace Market.Infrastructure.Repositories
                 IgnoreId = ignoreId
             }) > 0;
         }
+
+        public async Task<ProductPrice?> GetCurrentByProductIdAsync(Guid productId, DateTime now)
+        {
+            using var connection = await ConnectionFactory.CreateOpenConnectionAsync();
+
+            var sql = $@"
+                SELECT {SelectColumns}
+                FROM ""{TableName}""
+                WHERE ""DeletedAt"" IS NULL
+                  AND ""ProductId"" = @ProductId
+                  AND ""ValidFrom"" <= @Now
+                  AND (""ValidTo"" IS NULL OR ""ValidTo"" >= @Now)
+                ORDER BY ""ValidFrom"" DESC
+                LIMIT 1";
+
+            return await connection.QueryFirstOrDefaultAsync<ProductPrice>(sql, new
+            {
+                ProductId = productId,
+                Now = now
+            });
+        }
     }
 }

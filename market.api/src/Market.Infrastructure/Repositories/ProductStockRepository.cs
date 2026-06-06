@@ -30,5 +30,18 @@ namespace Market.Infrastructure.Repositories
 
             return await connection.ExecuteScalarAsync<int>(sql, new { ProductId = productId, IgnoreId = ignoreId }) > 0;
         }
+
+        public async Task<ProductStock?> GetByProductIdAsync(Guid productId)
+        {
+            using var connection = await ConnectionFactory.CreateOpenConnectionAsync();
+
+            var sql = $@"
+                SELECT {SelectColumns}
+                FROM ""ProductStock""
+                WHERE ""DeletedAt"" IS NULL
+                  AND ""ProductId"" = @ProductId";
+
+            return await connection.QueryFirstOrDefaultAsync<ProductStock>(sql, new { ProductId = productId });
+        }
     }
 }

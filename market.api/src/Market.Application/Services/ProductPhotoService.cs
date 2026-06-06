@@ -7,8 +7,18 @@ namespace Market.Application.Services
 {
     public class ProductPhotoService : CrudService<ProductPhoto, ProductPhotoDto, ProductPhotoCreateDto, ProductPhotoUpdateDto>, IProductPhotoService
     {
+        private readonly IProductPhotoRepository _repository;
+
         public ProductPhotoService(IProductPhotoRepository repository) : base(repository, "ProductPhoto")
         {
+            _repository = repository;
+        }
+
+        public async Task<IEnumerable<ProductPhotoDto>> GetByProductIdAsync(Guid productId)
+        {
+            var photos = await _repository.GetByProductIdAsync(productId);
+
+            return photos.Select(ToDto);
         }
 
         protected override Guid GetId(ProductPhotoUpdateDto dto) => dto.Id;

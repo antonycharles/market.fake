@@ -15,6 +15,13 @@ namespace Market.Application.Services
             _repository = repository;
         }
 
+        public async Task<ProductStockDto?> GetByProductIdAsync(Guid productId)
+        {
+            var stock = await _repository.GetByProductIdAsync(productId);
+
+            return stock is null ? null : ToDto(stock);
+        }
+
         protected override async Task ValidateCreateAsync(ProductStockCreateDto dto)
         {
             if (await _repository.ProductIdExistsAsync(dto.ProductId))

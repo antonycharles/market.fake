@@ -1,18 +1,55 @@
 @page "/products"
 @using Microsoft.AspNetCore.Authorization
+@using Market.Web.Extensions
 @implements IAsyncDisposable
 @inject ProductService ProductService
+@inject CategoryService CategoryService
 @inject IJSRuntime JS
 
 @attribute [Authorize]
 
 <PageTitle>Products</PageTitle>
 
-<div class=" container products-page">
+<div class="container products-page">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h3 class="mb-1">Products</h3>
-            <p class="text-muted mb-0">Browse products with scroll pagination.</p>
+            <p class="text-muted mb-0">Browse products by category or search.</p>
+        </div>
+    </div>
+
+    <div class="products-filters">
+        <div class="products-filters__field">
+            <label class="form-label" for="product-search">Search</label>
+            <input id="product-search"
+                   class="form-control"
+                   placeholder="Name, code, slug or category"
+                   @bind="searchText"
+                   @bind:event="oninput" />
+        </div>
+        <div class="products-filters__field">
+            <label class="form-label" for="product-category">Category</label>
+            <select id="product-category" class="form-select" @bind="selectedCategoryId">
+                <option value="">All categories</option>
+                @foreach (var category in categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </select>
+        </div>
+        <div class="products-filters__field">
+            <label class="form-label" for="product-order">Order by</label>
+            <select id="product-order" class="form-select" @bind="selectedOrderBy">
+                <option value="0">Default</option>
+                @foreach (var order in Enum.GetValues<Infraestruture.Enums.ProductOrderEnum>())
+                {
+                    <option value="@order">@order.GetDisplayName()</option>
+                }
+            </select>
+        </div>
+        <div class="products-filters__actions">
+            <button type="button" class="btn btn-primary" @onclick="ApplyFiltersAsync">Search</button>
+            <button type="button" class="btn btn-outline-secondary" @onclick="ClearFiltersAsync">Clear</button>
         </div>
     </div>
 
@@ -35,22 +72,37 @@
         }
         else if (!hasMore)
         {
-            <div class="products-loading text-muted">No more products.</div>
+            <div class="products-loading text-muted">
+                @(products.Count == 0 ? "No products found." : "No more products.")
+            </div>
         }
     }
 </div>
 
 @code {
+    [SupplyParameterFromQuery(Name = "categoryId")]
+    public string? CategoryIdQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "search")]
+    public string? SearchQuery { get; set; }
+
     private const int PageSize = 8;
     private readonly List<ProductDto> products = new();
+    private List<CategoryDto> categories = new();
     private DotNetObjectReference<List>? dotNetRef;
     private IJSObjectReference? scrollModule;
     private int pageIndex;
     private bool hasMore = true;
     private bool isLoading;
+    private string? searchText;
+    private string? selectedCategoryId;
+    private Infraestruture.Enums.ProductOrderEnum selectedOrderBy = Infraestruture.Enums.ProductOrderEnum.BestSellingDesc;
 
     protected override async Task OnInitializedAsync()
     {
+        selectedCategoryId = CategoryIdQuery;
+        searchText = SearchQuery;
+        categories = await CategoryService.GetAll();
         await LoadNextPageAsync();
     }
 
@@ -78,12 +130,30 @@
         }
 
         isLoading = true;
-        var nextProducts = await ProductService.GetPagedAsync(pageIndex, PageSize);
+        var categoryId = Guid.TryParse(selectedCategoryId, out var parsedCategoryId)
+            ? parsedCategoryId
+            : (Guid?)null;
+        var nextProducts = await ProductService.GetPagedAsync(pageIndex, PageSize, categoryId, searchText, orderBy: selectedOrderBy);
         products.AddRange(nextProducts);
         pageIndex++;
         hasMore = nextProducts.Count == PageSize;
         isLoading = false;
         StateHasChanged();
+    }
+
+    private async Task ApplyFiltersAsync()
+    {
+        products.Clear();
+        pageIndex = 0;
+        hasMore = true;
+        await LoadNextPageAsync();
+    }
+
+    private async Task ClearFiltersAsync()
+    {
+        searchText = null;
+        selectedCategoryId = null;
+        await ApplyFiltersAsync();
     }
 
     public async ValueTask DisposeAsync()

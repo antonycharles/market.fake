@@ -4,5 +4,6 @@ namespace Market.Domain.Interfaces
 {
     public interface IProductCategoryRepository : ICrudRepository<ProductCategory>
     {
+        Task<IEnumerable<Category>> GetCategoriesByProductIdAsync(Guid productId);
     }
 }

@@ -12,7 +12,10 @@ namespace Market.Infraestruture.Services
 
         public CategoryService(IConfiguration configuration, AuthenticationStateProvider authStateProvider)
         {
-            _http = new HttpClient { BaseAddress = new Uri(configuration["MarketApiUrl"]) };
+            var marketApiUrl = configuration["MarketApiUrl"]
+                ?? throw new InvalidOperationException("MarketApiUrl setting is required.");
+
+            _http = new HttpClient { BaseAddress = new Uri(marketApiUrl) };
             _authStateProvider = authStateProvider;
         }
 
@@ -31,10 +34,12 @@ namespace Market.Infraestruture.Services
             }
         }
 
-        public async Task<List<CategoryDto>> GetAll()
+        public async Task<List<CategoryDto>> GetAll(int pageSize = 100)
         {
-            await AddBearerTokenAsync();
-            return await _http.GetFromJsonAsync<List<CategoryDto>>("v1/Category") ?? new List<CategoryDto>();
+            var response = await _http.GetFromJsonAsync<PaginatedResponse<CategoryDto>>(
+                $"v1/Categories?PageIndex=1&PageSize={pageSize}");
+
+            return response?.Items ?? new List<CategoryDto>();
         }
     }
 }

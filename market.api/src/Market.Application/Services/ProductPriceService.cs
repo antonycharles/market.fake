@@ -15,6 +15,13 @@ namespace Market.Application.Services
             _repository = repository;
         }
 
+        public async Task<ProductPriceDto?> GetCurrentByProductIdAsync(Guid productId)
+        {
+            var price = await _repository.GetCurrentByProductIdAsync(productId, DateTime.UtcNow);
+
+            return price is null ? null : ToDto(price);
+        }
+
         protected override async Task ValidateCreateAsync(ProductPriceCreateDto dto)
         {
             ValidateInterval(dto.ValidFrom, dto.ValidTo);

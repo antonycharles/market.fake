@@ -1,3 +1,25 @@
+.products-filters {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(220px, 320px) auto;
+    gap: 1rem;
+    align-items: end;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.products-filters__field .form-label {
+    color: #374151;
+    font-weight: 600;
+}
+
+.products-filters__actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .products-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -16,6 +38,18 @@
 }
 
 @media (max-width: 800px) {
+    .products-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .products-filters__actions {
+        justify-content: stretch;
+    }
+
+    .products-filters__actions .btn {
+        flex: 1;
+    }
+
     .products-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }

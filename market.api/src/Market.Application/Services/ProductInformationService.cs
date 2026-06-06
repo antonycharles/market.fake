@@ -7,8 +7,18 @@ namespace Market.Application.Services
 {
     public class ProductInformationService : CrudService<ProductInformation, ProductInformationDto, ProductInformationCreateDto, ProductInformationUpdateDto>, IProductInformationService
     {
+        private readonly IProductInformationRepository _repository;
+
         public ProductInformationService(IProductInformationRepository repository) : base(repository, "ProductInformation")
         {
+            _repository = repository;
+        }
+
+        public async Task<IEnumerable<ProductInformationDto>> GetByProductIdAsync(Guid productId)
+        {
+            var informations = await _repository.GetByProductIdAsync(productId);
+
+            return informations.Select(ToDto);
         }
 
         protected override Guid GetId(ProductInformationUpdateDto dto) => dto.Id;
