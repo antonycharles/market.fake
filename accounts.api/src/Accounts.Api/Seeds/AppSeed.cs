@@ -75,7 +75,7 @@ namespace Accounts.Api.Seeds
                 Code = 7,
                 Type = AppTypeEnum.Api,
                 Name = "Market - Web",
-                Slug = "market-api",
+                Slug = "market-web",
                 FaviconUrl = $"{settings.FileApiUrl}/File/71402371-2fc0-4e15-b9e0-384f45508afb",
                 IsPublic = true,
                 Status = StatusEnum.Active

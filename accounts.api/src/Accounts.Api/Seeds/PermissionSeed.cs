@@ -111,7 +111,7 @@ namespace Accounts.Api.Seeds
 
         private static void SeederMarketApi(AccountsContext context)
         {
-            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "market-api");
+            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "market-web");
 
             if (app == null)
                 return;

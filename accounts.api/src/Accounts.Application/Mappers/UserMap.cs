@@ -23,7 +23,6 @@ namespace Accounts.Application.Mappers
             Name = user.Name,
             Email = user.Email,
             Status = user.Status,
-            ImageUrl = user.UserPhoto != null ? fileUrl + "/File/" + user.UserPhoto.DocumentId.ToString() : null,
             Profiles = user.UserProfiles?.Select(s => s.ToUserProfileResponse()).ToList(),
         };
 

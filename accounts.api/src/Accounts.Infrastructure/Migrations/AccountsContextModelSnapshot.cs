@@ -341,43 +341,6 @@ namespace Accounts.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Accounts.Core.Entities.UserPhoto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("DocumentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DocumentUrl")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("UserPhotos");
-                });
-
             modelBuilder.Entity("Accounts.Core.Entities.UserProfile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -488,17 +451,6 @@ namespace Accounts.Infrastructure.Migrations
                     b.Navigation("Profile");
                 });
 
-            modelBuilder.Entity("Accounts.Core.Entities.UserPhoto", b =>
-                {
-                    b.HasOne("Accounts.Core.Entities.User", "User")
-                        .WithOne("UserPhoto")
-                        .HasForeignKey("Accounts.Core.Entities.UserPhoto", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Accounts.Core.Entities.UserProfile", b =>
                 {
                     b.HasOne("Accounts.Core.Entities.Profile", "Profile")
@@ -542,8 +494,6 @@ namespace Accounts.Infrastructure.Migrations
 
             modelBuilder.Entity("Accounts.Core.Entities.User", b =>
                 {
-                    b.Navigation("UserPhoto");
-
                     b.Navigation("UserProfiles");
                 });
 #pragma warning restore 612, 618

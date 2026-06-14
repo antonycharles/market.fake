@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Accounts.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class StartDB : Migration
+    public partial class StartedDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -150,30 +150,6 @@ namespace Accounts.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserPhotos",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    DocumentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    DocumentUrl = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserPhotos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserPhotos_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ClientProfiles",
                 columns: table => new
                 {
@@ -303,12 +279,6 @@ namespace Accounts.Infrastructure.Migrations
                 column: "AppId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserPhotos_UserId",
-                table: "UserPhotos",
-                column: "UserId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserProfiles_ProfileId",
                 table: "UserProfiles",
                 column: "ProfileId");
@@ -336,9 +306,6 @@ namespace Accounts.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProfilePermissions");
-
-            migrationBuilder.DropTable(
-                name: "UserPhotos");
 
             migrationBuilder.DropTable(
                 name: "UserProfiles");

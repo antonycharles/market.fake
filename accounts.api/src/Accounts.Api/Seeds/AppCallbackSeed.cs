@@ -32,9 +32,9 @@ namespace Accounts.Api.Seeds
 
 
             callbacks.Add(new AppCallback{
-                Url = "http://localhost/project/auth/callback",
+                Url = "http://localhost/market/auth/callback",
                 Environment = Core.Enums.EnvironmentEnum.Staging,
-                AppId = apps.FirstOrDefault(a => a.Slug == "market-api").Id,
+                AppId = apps.FirstOrDefault(a => a.Slug == "market-web").Id,
                 IsDefault = true
             });
 

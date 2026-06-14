@@ -80,7 +80,6 @@ namespace Accounts.Application.Handlers
                 .ThenInclude(i => i.Profile)
                 .ThenInclude(i => i.ProfilePermissions.Where(w => w.Status == StatusEnum.Active && w.IsDeleted == false))
                 .ThenInclude(i => i.Permission)
-                .Include(i => i.UserPhoto)
                 .FirstOrDefaultAsync(w => w.Id == userId);
 
             var profileQuery = user?.UserProfiles?
@@ -96,8 +95,7 @@ namespace Accounts.Application.Handlers
                 new Claim(CustomClaimTypes.Id, user.Id.ToString()),
                 new Claim(CustomClaimTypes.Name, user.Name),
                 new Claim(CustomClaimTypes.Email, user.Email),
-                new Claim(CustomClaimTypes.Type, UserTypeEnum.user.ToString()),
-                new Claim(CustomClaimTypes.Image, user.UserPhoto != null ? _settings.FileApiUrl + "/File/" + user.UserPhoto.DocumentId : "")
+                new Claim(CustomClaimTypes.Type, UserTypeEnum.user.ToString())
             };
 
             foreach (var role in roles)

@@ -8,7 +8,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <MessagingPackagesVersion>1.0.0.4</MessagingPackagesVersion>
+    <MessagingPackagesVersion>1.0.0.17</MessagingPackagesVersion>
   </PropertyGroup>
 
   <ItemGroup>

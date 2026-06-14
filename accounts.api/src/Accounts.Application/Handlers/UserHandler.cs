@@ -106,7 +106,6 @@ namespace Accounts.Application.Handlers
                 .ThenInclude(i => i.Profile)
                 .ThenInclude(i => i.App)
                 .Include(i => i.UserProfiles.Where(w => w.Status == StatusEnum.Active && w.IsDeleted == false))
-                .Include(i => i.UserPhoto)
                 .FirstOrDefaultAsync(w => w.Id == id  && w.IsDeleted == false);
 
             if (user == null)
