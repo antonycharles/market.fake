@@ -44,6 +44,13 @@ namespace Accounts.Api.Seeds
                 Status = StatusEnum.Active
             });
 
+            clients.Add(new Client{
+                Id = new Guid("c94aa733-fdf9-40eb-82a9-5f6508273a76"),
+                Name = "user - API",
+                Password = passwordProvider.HashPassword("123456"),
+                Status = StatusEnum.Active
+            });
+
             var clientsDb = context.Clients.AsNoTracking().ToList();
 
             foreach(var client in clients)

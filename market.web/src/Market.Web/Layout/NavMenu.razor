@@ -138,12 +138,13 @@
 
     private void Login()
     {
-        Nav.NavigateTo(Config["LoginWebUrl"] ?? "/", true);
+        var loginUrl = Config["LoginWebUrl"] ?? "/";
+        Nav.NavigateTo($"{loginUrl.TrimEnd('/')}/Login?appSlug={Config["MarketWebSlug"] ?? ""}", true);
     }
 
     private void CreateAccount()
     {
         var loginUrl = Config["LoginWebUrl"] ?? "/";
-        Nav.NavigateTo($"{loginUrl.TrimEnd('/')}/register", true);
+        Nav.NavigateTo($"{loginUrl.TrimEnd('/')}/SignUp?appSlug={Config["MarketWebSlug"] ?? ""}", true);
     }
 }

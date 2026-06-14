@@ -20,7 +20,11 @@ namespace User.Application.Mappers
             Name = user.Name,
             Email = user.Email,
             Status = user.Status,
-            ImageUrl = user.UserPhoto != null ? fileUrl + "/File/" + user.UserPhoto.DocumentId : null
+            ImageUrl = user.UserPhotos
+                .Where(w => w.IsDeleted == false)
+                .OrderBy(o => o.Type)
+                .Select(s => fileUrl + "/File/" + s.DocumentId)
+                .FirstOrDefault()
         };
 
         public static void Update(this UserEntity user, UserUpdateRequest request)

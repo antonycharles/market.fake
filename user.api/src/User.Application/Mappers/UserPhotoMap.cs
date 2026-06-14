@@ -12,7 +12,8 @@ namespace User.Application.Mappers
             {
                 UserId = request.UserId,
                 DocumentId = request.DocumentId,
-                DocumentUrl = request.DocumentUrl
+                DocumentUrl = request.DocumentUrl,
+                Type = request.Type
             };
         }
 
@@ -20,6 +21,7 @@ namespace User.Application.Mappers
         {
             userPhoto.DocumentId = request.DocumentId;
             userPhoto.DocumentUrl = request.DocumentUrl;
+            userPhoto.Type = request.Type;
             userPhoto.UpdatedAt = DateTime.UtcNow;
         }
 
@@ -28,7 +30,8 @@ namespace User.Application.Mappers
             Id = userPhoto.Id,
             UserId = userPhoto.UserId,
             DocumentId = userPhoto.DocumentId,
-            DocumentUrl = userPhoto.DocumentUrl
+            DocumentUrl = userPhoto.DocumentUrl,
+            Type = userPhoto.Type
         };
     }
 }

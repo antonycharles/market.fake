@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using User.Application.Mappers;
-using User.Application.Providers;
 using User.Core;
 using User.Core.Enums;
 using User.Core.Exceptions;
@@ -16,23 +15,19 @@ namespace User.Application.Handlers
     public class UserHandler : IUserHandler
     {
         private readonly UserContext _context;
-        private readonly IPasswordProvider _passwordProvider;
         private readonly UserSettings _settings;
 
         public UserHandler(
             UserContext context,
-            IPasswordProvider passwordProvider,
             IOptions<UserSettings> settings)
         {
             _context = context;
-            _passwordProvider = passwordProvider;
             _settings = settings.Value;
         }
 
         public async Task<UserResponse> CreateAsync(UserRequest request)
         {
             var user = request.ToUser();
-            user.Password = _passwordProvider.HashPassword(request.Password);
 
             await ValidExistsAsync(user);
 
@@ -60,7 +55,7 @@ namespace User.Application.Handlers
         public async Task<PaginatedResponse<UserResponse>> GetAsync(PaginatedRequest request)
         {
             var query = _context.Users.AsNoTracking()
-                .Include(i => i.UserPhoto)
+                .Include(i => i.UserPhotos)
                 .Where(w => w.IsDeleted == false);
 
             if (request.UserId.HasValue)
@@ -86,7 +81,7 @@ namespace User.Application.Handlers
         public async Task<UserResponse> GetByIdAsync(Guid id)
         {
             var user = await _context.Users.AsNoTracking()
-                .Include(i => i.UserPhoto)
+                .Include(i => i.UserPhotos)
                 .FirstOrDefaultAsync(w => w.Id == id && w.IsDeleted == false);
 
             if (user == null)
@@ -104,9 +99,6 @@ namespace User.Application.Handlers
                 throw new NotFoundException("User not found");
 
             user.Update(request);
-
-            if (!string.IsNullOrWhiteSpace(request.Password))
-                user.Password = _passwordProvider.HashPassword(request.Password);
 
             await ValidExistsAsync(user);
 

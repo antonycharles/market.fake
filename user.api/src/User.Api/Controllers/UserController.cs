@@ -60,6 +60,33 @@ namespace User.Api.Controllers
             }
         }
 
+        [HttpGet("me")]
+        [AuthorizeRole(RoleConstants.UserRole.MeList)]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetMeAsync()
+        {
+            try
+            {
+                var userId = User.GetUserId();
+                if (!userId.HasValue)
+                    return Unauthorized();
+
+                var user = await _userHandler.GetByIdAsync(userId.Value);
+                return Ok(user);
+            }
+            catch (NotFoundException ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status404NotFound);
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+            }
+        }
+
         [HttpPost]
         [AuthorizeRole(RoleConstants.UserRole.Create)]
         [ProducesResponseType(typeof(UserResponse), StatusCodes.Status201Created)]
@@ -71,6 +98,41 @@ namespace User.Api.Controllers
             {
                 var user = await _userHandler.CreateAsync(request);
                 return Created("", user);
+            }
+            catch (BusinessException ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status400BadRequest);
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPut("me")]
+        [AuthorizeRole(RoleConstants.UserRole.MeUpdate)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateMeAsync([FromBody] UserUpdateRequest request)
+        {
+            try
+            {
+                if (request == null || !ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var userId = User.GetUserId();
+                if (!userId.HasValue)
+                    return Unauthorized();
+
+                await _userHandler.UpdateAsync(userId.Value, request);
+                return Ok();
+            }
+            catch (NotFoundException ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status404NotFound);
             }
             catch (BusinessException ex)
             {

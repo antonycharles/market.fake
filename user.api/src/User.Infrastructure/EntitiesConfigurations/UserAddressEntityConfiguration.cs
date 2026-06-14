@@ -4,9 +4,9 @@ using User.Core.Entities;
 
 namespace User.Infrastructure.EntitiesConfigurations
 {
-    public class UserPhotoEntityConfiguration : IEntityTypeConfiguration<UserPhoto>
+    public class UserAddressEntityConfiguration : IEntityTypeConfiguration<UserAddress>
     {
-        public void Configure(EntityTypeBuilder<UserPhoto> builder)
+        public void Configure(EntityTypeBuilder<UserAddress> builder)
         {
             builder
                 .HasIndex(i => i.UserId);

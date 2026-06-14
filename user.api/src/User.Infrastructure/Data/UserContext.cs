@@ -25,5 +25,7 @@ namespace User.Infrastructure.Data
 
         public virtual DbSet<UserEntity> Users { get; set; }
         public virtual DbSet<UserPhoto> UserPhotos { get; set; }
+        public virtual DbSet<UserAddress> UserAddresses { get; set; }
+        public virtual DbSet<UserCreditCard> UserCreditCards { get; set; }
     }
 }

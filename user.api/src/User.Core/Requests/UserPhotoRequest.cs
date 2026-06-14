@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using User.Core.Enums;
 
 namespace User.Core.Requests
 {
@@ -12,5 +13,7 @@ namespace User.Core.Requests
 
         [Required]
         public string DocumentUrl { get; set; }
+
+        public UserPhotoTypeEnum Type { get; set; } = UserPhotoTypeEnum.Secondary;
     }
 }

@@ -123,7 +123,7 @@ await runner.RunAsync();
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<PokemonProductSeeder>();
-    await seeder.SeedAsync();
+    //await seeder.SeedAsync();
 }
 
 if (app.Environment.IsDevelopment())

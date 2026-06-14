@@ -19,8 +19,49 @@ namespace Accounts.Api.Seeds
             SeederAccountsManagementUser(context);
             SeederAccountsApiPublicToken(context);
             SeederMarketApiAdmin(context);
+            SeederUserApiUser(context);
+            SeederUserApiClient(context);
 
             context.SaveChanges();
+        }
+
+        private static void SeederUserApiClient(AccountsContext context)
+        {var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "user-api");
+
+            if(app == null)
+                return;
+
+            var profile = context.Profiles.AsNoTracking()
+                .FirstOrDefault(w => w.Slug == "client" && w.AppId == app.Id);
+
+            if(profile == null)
+                return;
+
+            var permissions = context.Permissions.AsNoTracking()
+                .Where(w => w.AppId == app.Id)
+                .ToList();
+
+            AddProfilePermission(context, profile, permissions);
+        }
+
+        private static void SeederUserApiUser(AccountsContext context)
+        {
+            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "user-api");
+
+            if(app == null)
+                return;
+
+            var profile = context.Profiles.AsNoTracking()
+                .FirstOrDefault(w => w.Slug == "user" && w.AppId == app.Id);
+
+            if(profile == null)
+                return;
+
+            var permissions = context.Permissions.AsNoTracking()
+                .Where(w => w.AppId == app.Id)
+                .Where(w => w.Role.Contains("-me-")).ToList();
+
+            AddProfilePermission(context, profile, permissions);
         }
 
         private static void SeederMarketApiAdmin(AccountsContext context)

@@ -12,10 +12,8 @@ namespace User.Core.Entities
         [MaxLength(150)]
         public string Email { get; set; }
 
-        [Required]
-        [MaxLength(200)]
-        public string Password { get; set; }
-
-        public UserPhoto? UserPhoto { get; set; }
+        public ICollection<UserPhoto> UserPhotos { get; set; } = [];
+        public ICollection<UserAddress> UserAddresses { get; set; } = [];
+        public ICollection<UserCreditCard> UserCreditCards { get; set; } = [];
     }
 }

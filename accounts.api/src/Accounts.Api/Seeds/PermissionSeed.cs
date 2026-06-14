@@ -14,10 +14,47 @@ namespace Accounts.Api.Seeds
             SeederAccounts(context);
             SeederManagement(context);
             SeederMarketApi(context);
+            SeederUserApi(context);
 
             context.SaveChanges();
-        } 
+        }
 
+        private static void SeederUserApi(AccountsContext context)
+        {
+            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "user-api");
+
+            if (app == null)
+                return;
+
+            var permissions = new List<Permission>();
+            BasicCRUD(context, app, permissions, "User", "user");
+            BasicCRUD(context, app, permissions, "Photo", "photo");
+            BasicCRUD(context, app, permissions, "Address", "address");
+            BasicCRUD(context, app, permissions, "Credit Card", "credit-card");
+
+            permissions.Add(new Permission { Name = "User Me - list", Role = "user-me-list", AppId = app.Id });
+            permissions.Add(new Permission { Name = "User Me - update", Role = "user-me-update", AppId = app.Id });
+
+            permissions.Add(new Permission { Name = "Photo Me - list", Role = "photo-me-list", AppId = app.Id });
+            permissions.Add(new Permission { Name = "Photo Me - update", Role = "photo-me-update", AppId = app.Id });
+            permissions.Add(new Permission { Name = "Photo Me - delete", Role = "photo-me-delete", AppId = app.Id });
+
+            permissions.Add(new Permission { Name = "Address Me - list", Role = "address-me-list", AppId = app.Id });
+            permissions.Add(new Permission { Name = "Address Me - update", Role = "address-me-update", AppId = app.Id });
+            permissions.Add(new Permission { Name = "Address Me - delete", Role = "address-me-delete", AppId = app.Id });
+
+            permissions.Add(new Permission { Name = "Credit Card Me - list", Role = "credit-card-me-list", AppId = app.Id });
+            permissions.Add(new Permission { Name = "Credit Card Me - update", Role = "credit-card-me-update", AppId = app.Id });
+            permissions.Add(new Permission { Name = "Credit Card Me - delete", Role = "credit-card-me-delete", AppId = app.Id });
+
+            var permissionsDb = context.Permissions.AsNoTracking().ToList();
+
+            foreach(var permission in permissions)
+            {
+                if(!permissionsDb.Any(w => w.Role == permission.Role && w.AppId == permission.AppId))
+                    context.Permissions.Add(permission);
+            }
+        }
 
         private static void SeederAccounts(AccountsContext context)
         {
@@ -100,7 +137,7 @@ namespace Accounts.Api.Seeds
 
         private static void BasicCRUD(AccountsContext context, App app, List<Permission> permissions, string namePermission, string rolePermission)
         {
-            var permissionId = context.Permissions.FirstOrDefault(w => w.Role == rolePermission + "-list")?.Id ?? Guid.NewGuid();
+            var permissionId = context.Permissions.FirstOrDefault(w => w.Role == rolePermission + "-list" && w.AppId == app.Id)?.Id ?? Guid.NewGuid();
             permissions.Add(new Permission { Id = permissionId, Name = namePermission + " - list", Role = rolePermission + "-list", AppId = app.Id });
             permissions.Add(new Permission { Name = namePermission + " - create", Role = rolePermission + "-create", AppId = app.Id, PermissionFatherId = permissionId });
             permissions.Add(new Permission { Name = namePermission + " - update", Role = rolePermission + "-update", AppId = app.Id, PermissionFatherId = permissionId });

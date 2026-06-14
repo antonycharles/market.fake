@@ -13,9 +13,19 @@ namespace User.Infrastructure.EntitiesConfigurations
                 .IsUnique();
 
             builder
-                .HasOne(i => i.UserPhoto)
+                .HasMany(i => i.UserPhotos)
                 .WithOne(i => i.User)
-                .HasForeignKey<User.Core.Entities.UserPhoto>(i => i.UserId);
+                .HasForeignKey(i => i.UserId);
+
+            builder
+                .HasMany(i => i.UserAddresses)
+                .WithOne(i => i.User)
+                .HasForeignKey(i => i.UserId);
+
+            builder
+                .HasMany(i => i.UserCreditCards)
+                .WithOne(i => i.User)
+                .HasForeignKey(i => i.UserId);
         }
     }
 }

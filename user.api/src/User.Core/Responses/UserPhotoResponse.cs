@@ -1,3 +1,5 @@
+using User.Core.Enums;
+
 namespace User.Core.Responses
 {
     public class UserPhotoResponse
@@ -6,5 +8,6 @@ namespace User.Core.Responses
         public Guid UserId { get; set; }
         public Guid DocumentId { get; set; }
         public string DocumentUrl { get; set; }
+        public UserPhotoTypeEnum Type { get; set; }
     }
 }

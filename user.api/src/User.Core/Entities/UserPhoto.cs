@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using User.Core.Enums;
 
 namespace User.Core.Entities
 {
@@ -13,5 +14,8 @@ namespace User.Core.Entities
         [Required]
         [MaxLength(200)]
         public string DocumentUrl { get; set; }
+
+        [Required]
+        public UserPhotoTypeEnum Type { get; set; } = UserPhotoTypeEnum.Secondary;
     }
 }

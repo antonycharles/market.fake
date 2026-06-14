@@ -89,6 +89,15 @@ namespace Accounts.Api.Seeds
                 Status = StatusEnum.Active
             });
 
+            apps.Add(new App
+            {
+                Code = 9,
+                Type = AppTypeEnum.Api,
+                Name = "User - Api",
+                Slug = "user-api",
+                Status = StatusEnum.Active
+            });
+
             var appsDb = context.Apps.AsNoTracking().ToList();
 
             foreach(var app in apps)

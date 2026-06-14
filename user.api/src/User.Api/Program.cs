@@ -1,8 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using User.Api.Configurations;
+using User.Application.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,21 @@ builder.Services.AddVersionedApiExplorer(options =>
     options.GroupNameFormat = "'v'VVV";
     options.SubstituteApiVersionInUrl = true;
 });
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = settings.AccountsApiUrl;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+            ValidateIssuer = false,
+            ValidateIssuerSigningKey = true,
+            NameClaimType = CustomClaimTypes.Name,
+            RoleClaimType = CustomClaimTypes.Role
+        };
+    });
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -78,7 +95,29 @@ app.AddMigration();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger(c =>
+    {
+        c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+        {
+            var basePath = httpReq.Headers["X-Forwarded-Prefix"].FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(basePath) &&
+                Uri.TryCreate(httpReq.Headers.Referer.FirstOrDefault(), UriKind.Absolute, out var referer))
+            {
+                var swaggerPathIndex = referer.AbsolutePath.IndexOf("/swagger", StringComparison.OrdinalIgnoreCase);
+                if (swaggerPathIndex > 0)
+                    basePath = referer.AbsolutePath[..swaggerPathIndex];
+            }
+
+            if (!string.IsNullOrWhiteSpace(basePath))
+            {
+                swaggerDoc.Servers = new List<OpenApiServer>
+                {
+                    new() { Url = basePath.TrimEnd('/') }
+                };
+            }
+        });
+    });
     app.UseSwaggerUI();
 }
 

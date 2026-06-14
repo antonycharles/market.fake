@@ -12,25 +12,25 @@ namespace User.Api.Controllers
     [Authorize]
     [Route("v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
-    public class UserPhotoController : ControllerBase
+    public class UserCreditCardController : ControllerBase
     {
-        private readonly IUserPhotoHandler _userPhotoHandler;
+        private readonly IUserCreditCardHandler _userCreditCardHandler;
 
-        public UserPhotoController(IUserPhotoHandler userPhotoHandler)
+        public UserCreditCardController(IUserCreditCardHandler userCreditCardHandler)
         {
-            _userPhotoHandler = userPhotoHandler;
+            _userCreditCardHandler = userCreditCardHandler;
         }
 
         [HttpGet("user/{userId}")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.List)]
-        [ProducesResponseType(typeof(List<UserPhotoResponse>), StatusCodes.Status200OK)]
+        [AuthorizeRole(RoleConstants.UserCreditCardRole.List)]
+        [ProducesResponseType(typeof(List<UserCreditCardResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByUserIdAsync(Guid userId)
         {
             try
             {
-                var response = await _userPhotoHandler.GetByUserIdAsync(userId);
+                var response = await _userCreditCardHandler.GetByUserIdAsync(userId);
                 return Ok(response);
             }
             catch (BusinessException ex)
@@ -44,8 +44,8 @@ namespace User.Api.Controllers
         }
 
         [HttpGet("me")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.MeList)]
-        [ProducesResponseType(typeof(List<UserPhotoResponse>), StatusCodes.Status200OK)]
+        [AuthorizeRole(RoleConstants.UserCreditCardRole.MeList)]
+        [ProducesResponseType(typeof(List<UserCreditCardResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -57,7 +57,7 @@ namespace User.Api.Controllers
                 if (!userId.HasValue)
                     return Unauthorized();
 
-                var response = await _userPhotoHandler.GetByUserIdAsync(userId.Value);
+                var response = await _userCreditCardHandler.GetByUserIdAsync(userId.Value);
                 return Ok(response);
             }
             catch (BusinessException ex)
@@ -71,15 +71,42 @@ namespace User.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.List)]
-        [ProducesResponseType(typeof(UserPhotoResponse), StatusCodes.Status200OK)]
+        [AuthorizeRole(RoleConstants.UserCreditCardRole.List)]
+        [ProducesResponseType(typeof(UserCreditCardResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             try
             {
-                var response = await _userPhotoHandler.GetByIdAsync(id);
+                var response = await _userCreditCardHandler.GetByIdAsync(id);
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status404NotFound);
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("me/{id}")]
+        [AuthorizeRole(RoleConstants.UserCreditCardRole.MeList)]
+        [ProducesResponseType(typeof(UserCreditCardResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetByIdMeAsync(Guid id)
+        {
+            try
+            {
+                var userId = User.GetUserId();
+
+                if (!userId.HasValue)
+                    return Unauthorized();
+                    
+                var response = await _userCreditCardHandler.GetByIdMeAsync(id, userId.Value);
                 return Ok(response);
             }
             catch (NotFoundException ex)
@@ -93,19 +120,24 @@ namespace User.Api.Controllers
         }
 
         [HttpPost]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.Create, RoleConstants.UserPhotoRole.Update)]
+        [AuthorizeRole(RoleConstants.UserCreditCardRole.Create, RoleConstants.UserCreditCardRole.Update)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateOrCreateAsync([FromBody] UserPhotoRequest request)
+        public async Task<IActionResult> UpdateOrCreateAsync([FromBody] UserCreditCardRequest request)
         {
             try
             {
                 if (request == null || !ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                await _userPhotoHandler.UpdateOrCreateAsync(request);
+                await _userCreditCardHandler.UpdateOrCreateAsync(request);
                 return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status404NotFound);
             }
             catch (BusinessException ex)
             {
@@ -118,12 +150,13 @@ namespace User.Api.Controllers
         }
 
         [HttpPost("me")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.MeCreate, RoleConstants.UserPhotoRole.MeUpdate)]
+        [AuthorizeRole(RoleConstants.UserCreditCardRole.MeCreate, RoleConstants.UserCreditCardRole.MeUpdate)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateOrCreateMeAsync([FromBody] UserPhotoRequest request)
+        public async Task<IActionResult> UpdateOrCreateMeAsync([FromBody] UserCreditCardRequest request)
         {
             try
             {
@@ -135,8 +168,12 @@ namespace User.Api.Controllers
                     return Unauthorized();
 
                 request.UserId = userId.Value;
-                await _userPhotoHandler.UpdateOrCreateAsync(request);
+                await _userCreditCardHandler.UpdateOrCreateAsync(request);
                 return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status404NotFound);
             }
             catch (BusinessException ex)
             {
@@ -149,7 +186,7 @@ namespace User.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.Delete)]
+        [AuthorizeRole(RoleConstants.UserCreditCardRole.Delete)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -157,7 +194,7 @@ namespace User.Api.Controllers
         {
             try
             {
-                await _userPhotoHandler.DeleteAsync(id);
+                await _userCreditCardHandler.DeleteAsync(id);
                 return Ok();
             }
             catch (NotFoundException ex)
@@ -171,7 +208,7 @@ namespace User.Api.Controllers
         }
 
         [HttpDelete("me/{id}")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.MeDelete)]
+        [AuthorizeRole(RoleConstants.UserCreditCardRole.MeDelete)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -184,7 +221,7 @@ namespace User.Api.Controllers
                 if (!userId.HasValue)
                     return Unauthorized();
 
-                await _userPhotoHandler.DeleteMeAsync(id, userId.Value);
+                await _userCreditCardHandler.DeleteMeAsync(id, userId.Value);
                 return Ok();
             }
             catch (NotFoundException ex)

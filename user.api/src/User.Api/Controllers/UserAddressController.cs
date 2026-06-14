@@ -12,25 +12,25 @@ namespace User.Api.Controllers
     [Authorize]
     [Route("v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
-    public class UserPhotoController : ControllerBase
+    public class UserAddressController : ControllerBase
     {
-        private readonly IUserPhotoHandler _userPhotoHandler;
+        private readonly IUserAddressHandler _userAddressHandler;
 
-        public UserPhotoController(IUserPhotoHandler userPhotoHandler)
+        public UserAddressController(IUserAddressHandler userAddressHandler)
         {
-            _userPhotoHandler = userPhotoHandler;
+            _userAddressHandler = userAddressHandler;
         }
 
         [HttpGet("user/{userId}")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.List)]
-        [ProducesResponseType(typeof(List<UserPhotoResponse>), StatusCodes.Status200OK)]
+        [AuthorizeRole(RoleConstants.UserAddressRole.List)]
+        [ProducesResponseType(typeof(List<UserAddressResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByUserIdAsync(Guid userId)
         {
             try
             {
-                var response = await _userPhotoHandler.GetByUserIdAsync(userId);
+                var response = await _userAddressHandler.GetByUserIdAsync(userId);
                 return Ok(response);
             }
             catch (BusinessException ex)
@@ -44,8 +44,8 @@ namespace User.Api.Controllers
         }
 
         [HttpGet("me")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.MeList)]
-        [ProducesResponseType(typeof(List<UserPhotoResponse>), StatusCodes.Status200OK)]
+        [AuthorizeRole(RoleConstants.UserAddressRole.MeList)]
+        [ProducesResponseType(typeof(List<UserAddressResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -57,7 +57,7 @@ namespace User.Api.Controllers
                 if (!userId.HasValue)
                     return Unauthorized();
 
-                var response = await _userPhotoHandler.GetByUserIdAsync(userId.Value);
+                var response = await _userAddressHandler.GetByUserIdAsync(userId.Value);
                 return Ok(response);
             }
             catch (BusinessException ex)
@@ -71,15 +71,15 @@ namespace User.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.List)]
-        [ProducesResponseType(typeof(UserPhotoResponse), StatusCodes.Status200OK)]
+        [AuthorizeRole(RoleConstants.UserAddressRole.List)]
+        [ProducesResponseType(typeof(UserAddressResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             try
             {
-                var response = await _userPhotoHandler.GetByIdAsync(id);
+                var response = await _userAddressHandler.GetByIdAsync(id);
                 return Ok(response);
             }
             catch (NotFoundException ex)
@@ -93,19 +93,24 @@ namespace User.Api.Controllers
         }
 
         [HttpPost]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.Create, RoleConstants.UserPhotoRole.Update)]
+        [AuthorizeRole(RoleConstants.UserAddressRole.Create, RoleConstants.UserAddressRole.Update)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateOrCreateAsync([FromBody] UserPhotoRequest request)
+        public async Task<IActionResult> UpdateOrCreateAsync([FromBody] UserAddressRequest request)
         {
             try
             {
                 if (request == null || !ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                await _userPhotoHandler.UpdateOrCreateAsync(request);
+                await _userAddressHandler.UpdateOrCreateAsync(request);
                 return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status404NotFound);
             }
             catch (BusinessException ex)
             {
@@ -118,12 +123,13 @@ namespace User.Api.Controllers
         }
 
         [HttpPost("me")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.MeCreate, RoleConstants.UserPhotoRole.MeUpdate)]
+        [AuthorizeRole(RoleConstants.UserAddressRole.MeCreate, RoleConstants.UserAddressRole.MeUpdate)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateOrCreateMeAsync([FromBody] UserPhotoRequest request)
+        public async Task<IActionResult> UpdateOrCreateMeAsync([FromBody] UserAddressRequest request)
         {
             try
             {
@@ -135,8 +141,12 @@ namespace User.Api.Controllers
                     return Unauthorized();
 
                 request.UserId = userId.Value;
-                await _userPhotoHandler.UpdateOrCreateAsync(request);
+                await _userAddressHandler.UpdateOrCreateAsync(request);
                 return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return Problem(ex.Message, statusCode: StatusCodes.Status404NotFound);
             }
             catch (BusinessException ex)
             {
@@ -149,7 +159,7 @@ namespace User.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.Delete)]
+        [AuthorizeRole(RoleConstants.UserAddressRole.Delete)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -157,7 +167,7 @@ namespace User.Api.Controllers
         {
             try
             {
-                await _userPhotoHandler.DeleteAsync(id);
+                await _userAddressHandler.DeleteAsync(id);
                 return Ok();
             }
             catch (NotFoundException ex)
@@ -171,7 +181,7 @@ namespace User.Api.Controllers
         }
 
         [HttpDelete("me/{id}")]
-        [AuthorizeRole(RoleConstants.UserPhotoRole.MeDelete)]
+        [AuthorizeRole(RoleConstants.UserAddressRole.MeDelete)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -184,7 +194,7 @@ namespace User.Api.Controllers
                 if (!userId.HasValue)
                     return Unauthorized();
 
-                await _userPhotoHandler.DeleteMeAsync(id, userId.Value);
+                await _userAddressHandler.DeleteMeAsync(id, userId.Value);
                 return Ok();
             }
             catch (NotFoundException ex)

@@ -18,8 +18,30 @@ namespace Accounts.Api.Seeds
             SeederFileApi(context);
             SeederMarketApi(context);
             SeederAccountsLoginWeb(context);
+            SeederUserApi(context);
 
             context.SaveChanges();
+        }
+
+        private static void SeederUserApi(AccountsContext context)
+        {
+            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "user-api");
+
+            if (app == null)
+                return;
+
+            var profiles = new List<Profile>();
+
+            profiles.Add(new Profile { Name = "User", AppId = app.Id, Slug = "user", IsDefault = true });
+            profiles.Add(new Profile { Name = "Client", AppId = app.Id, Slug = "client", IsDefault = false });
+
+            var profilesDb = context.Profiles.AsNoTracking().Where(w => w.AppId == app.Id).ToList();
+
+            foreach (var profile in profiles)
+            {
+                if (!profilesDb.Any(w => w.Slug == profile.Slug))
+                    context.Profiles.Add(profile);
+            }
         }
 
         private static void SeederAccountsLoginWeb(AccountsContext context)
