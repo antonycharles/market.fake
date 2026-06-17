@@ -1,4 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <MessagingPackagesVersion>1.0.0.18</MessagingPackagesVersion>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Accounts.Core\Accounts.Core.csproj" />
@@ -10,10 +16,8 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.1" />
   </ItemGroup>
   
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
+  <ItemGroup>
+    <PackageReference Include="Messaging.Abstractions" Version="$(MessagingPackagesVersion)" />
+    <PackageReference Include="Messaging.Contracts" Version="$(MessagingPackagesVersion)" />
+  </ItemGroup>
 </Project>

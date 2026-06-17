@@ -12,6 +12,8 @@ using Accounts.Core.Handlers;
 using Accounts.Core.Requests;
 using Accounts.Core.Responses;
 using Accounts.Infrastructure.Data;
+using Messaging.Abstractions;
+using Messaging.Contracts.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -22,24 +24,18 @@ namespace Accounts.Application.Handlers
         private readonly AccountsContext _context;
         private readonly IPasswordProvider _passwordProvider;
         private readonly AccountsSettings _settings;
-        private readonly IAppHandler _appHandler;
-        private readonly IProfileHandler _profileHandler;
-        private readonly IUserProfileHandler _userProfileHandler;
+        private readonly IEventBus _eventBus;
 
         public UserHandler(
             AccountsContext context,
             IPasswordProvider passwordProvider,
             IOptions<AccountsSettings> settings,
-            IProfileHandler profileHandler,
-            IUserProfileHandler userProfileHandler,
-            IAppHandler appHandler)
+            IEventBus eventBus)
         {
             _context = context;
             _passwordProvider = passwordProvider;
             _settings = settings.Value;
-            _profileHandler = profileHandler;
-            _userProfileHandler = userProfileHandler;
-            _appHandler = appHandler;
+            _eventBus = eventBus;
         }
 
         public async Task<UserResponse> CreateAsync(UserRequest request)
@@ -51,6 +47,10 @@ namespace Accounts.Application.Handlers
 
             _context.Add(user);
             await _context.SaveChangesAsync();
+
+            User_Created_Event userEvent = ToUserEvent(user);
+
+            await _eventBus.PublishAsync(userEvent);
 
             return user.ToUserResponse();
         }
@@ -68,6 +68,11 @@ namespace Accounts.Application.Handlers
             _context.Update(user);
 
             await _context.SaveChangesAsync();
+
+            user.Status = StatusEnum.Inactive;
+            User_Created_Event userEvent = ToUserEvent(user);
+
+            await _eventBus.PublishAsync(userEvent);
         }
 
         public async Task<PaginatedResponse<UserResponse>> GetAsync(PaginatedRequest request)
@@ -132,6 +137,9 @@ namespace Accounts.Application.Handlers
             _context.Update(user);
 
             await _context.SaveChangesAsync();
+
+            User_Created_Event userEvent = ToUserEvent(user);
+            await _eventBus.PublishAsync(userEvent);
         }
 
         private async Task ValidExistsAsync(User user)
@@ -141,6 +149,16 @@ namespace Accounts.Application.Handlers
 
             if(exist)
                 throw new BusinessException("User email already exists");
+        }
+
+        private static User_Created_Event ToUserEvent(User user)
+        {
+            return new User_Created_Event(
+                            user.Id,
+                            user.Name,
+                            user.Email,
+                            user.Status.ToString()
+                        );
         }
     }
 }

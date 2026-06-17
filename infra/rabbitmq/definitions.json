@@ -36,6 +36,13 @@
       "arguments": {}
     },
     {
+      "name": "user_queue",
+      "vhost": "fake-vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
       "name": "audit_queue",
       "vhost": "fake-vhost",
       "durable": true,
@@ -69,6 +76,14 @@
       "destination": "notification_queue",
       "destination_type": "queue",
       "routing_key": "project.#",
+      "arguments": {}
+    },
+    {
+      "source": "integration_events",
+      "vhost": "fake-vhost",
+      "destination": "user_queue",
+      "destination_type": "queue",
+      "routing_key": "user.#",
       "arguments": {}
     },
     {

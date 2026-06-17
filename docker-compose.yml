@@ -73,8 +73,11 @@ services:
 
     accountsapi:
         build:
-            context: ./accounts.api
-            dockerfile: Dockerfile
+            context: .
+            dockerfile: ./accounts.api/Dockerfile
+            args:
+                GITHUB_PACKAGES_USERNAME: ${GITHUB_PACKAGES_USERNAME}
+                GITHUB_PACKAGES_TOKEN: ${GITHUB_PACKAGES_TOKEN}
         container_name: accounts-api
         ports:
             - "9501:8080"

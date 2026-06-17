@@ -2,25 +2,32 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 LABEL maintainer="Antony Charles"
 WORKDIR /app
 
-COPY *.sln .
-COPY src/Accounts.Api/*.csproj ./src/Accounts.Api/
-COPY src/Accounts.Application/*.csproj ./src/Accounts.Application/
-COPY src/Accounts.Core/*.csproj ./src/Accounts.Core/
-COPY src/Accounts.Infrastructure/*.csproj ./src/Accounts.Infrastructure/
-COPY tests/Accounts.Api.Test/*.csproj ./tests/Accounts.Api.Test/
-COPY tests/Accounts.Application.Test/*.csproj ./tests/Accounts.Application.Test/
+ARG GITHUB_PACKAGES_USERNAME
+ARG GITHUB_PACKAGES_TOKEN
 
-RUN dotnet restore
+ENV GITHUB_PACKAGES_USERNAME=${GITHUB_PACKAGES_USERNAME}
+ENV GITHUB_PACKAGES_TOKEN=${GITHUB_PACKAGES_TOKEN}
 
-COPY src/Accounts.Api/. ./src/Accounts.Api/
-COPY src/Accounts.Application/. ./src/Accounts.Application/
-COPY src/Accounts.Core/. ./src/Accounts.Core/
-COPY src/Accounts.Infrastructure/. ./src/Accounts.Infrastructure/
-COPY tests/Accounts.Api.Test/. ./tests/Accounts.Api.Test/
-COPY tests/Accounts.Application.Test/. ./tests/Accounts.Application.Test/
+COPY accounts.api/*.sln ./accounts.api/
+COPY accounts.api/NuGet.Config ./accounts.api/
+COPY accounts.api/src/Accounts.Api/*.csproj ./accounts.api/src/Accounts.Api/
+COPY accounts.api/src/Accounts.Application/*.csproj ./accounts.api/src/Accounts.Application/
+COPY accounts.api/src/Accounts.Core/*.csproj ./accounts.api/src/Accounts.Core/
+COPY accounts.api/src/Accounts.Infrastructure/*.csproj ./accounts.api/src/Accounts.Infrastructure/
+COPY accounts.api/tests/Accounts.Api.Test/*.csproj ./accounts.api/tests/Accounts.Api.Test/
+COPY accounts.api/tests/Accounts.Application.Test/*.csproj ./accounts.api/tests/Accounts.Application.Test/
 
-WORKDIR /app/src/Accounts.Api
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet restore ./accounts.api/AccountsApi.sln --configfile ./accounts.api/NuGet.Config --no-cache --force --verbosity normal
+
+COPY accounts.api/src/Accounts.Api/. ./accounts.api/src/Accounts.Api/
+COPY accounts.api/src/Accounts.Application/. ./accounts.api/src/Accounts.Application/
+COPY accounts.api/src/Accounts.Core/. ./accounts.api/src/Accounts.Core/
+COPY accounts.api/src/Accounts.Infrastructure/. ./accounts.api/src/Accounts.Infrastructure/
+COPY accounts.api/tests/Accounts.Api.Test/. ./accounts.api/tests/Accounts.Api.Test/
+COPY accounts.api/tests/Accounts.Application.Test/. ./accounts.api/tests/Accounts.Application.Test/
+
+WORKDIR /app/accounts.api/src/Accounts.Api
+RUN dotnet publish -c Release -o /app/publish --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0.1
 WORKDIR /app

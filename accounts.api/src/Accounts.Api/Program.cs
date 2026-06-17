@@ -3,6 +3,9 @@ using System.Text.Json.Serialization;
 using Accounts.Api.Configurations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using Messaging.Abstractions;
+using Messaging.Contracts.Events;
+using Messaging.RabbitMQ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +78,10 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = settings.RedisConnection;
     options.InstanceName = settings.RedisInstanceName;
 });
+
+builder.Services.AddRabbitMqEventBus(
+    builder.Configuration,
+    typeof(User_Created_Event).Assembly);
 
 var app = builder.Build();
 

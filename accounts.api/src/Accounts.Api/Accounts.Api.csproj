@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <MessagingPackagesVersion>1.0.0.18</MessagingPackagesVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Messaging.Contracts" Version="$(MessagingPackagesVersion)" />
+    <PackageReference Include="Messaging.RabbitMQ" Version="$(MessagingPackagesVersion)" />
   </ItemGroup>
 
   <ItemGroup>
