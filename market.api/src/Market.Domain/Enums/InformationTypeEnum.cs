@@ -9,5 +9,10 @@ namespace Market.Domain.Enums
         Stats = 5,
         Types = 6,
         Id = 7,
+        Levels = 8,
+        Attributes = 9,
+        Fields = 10,
+        ReleaseDate = 11,
+        XAntibody = 12,
     }
 }

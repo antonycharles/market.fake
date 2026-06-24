@@ -50,6 +50,7 @@ builder.Services.AddScoped<IProductInformationService, ProductInformationService
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<IErrorLogService, ErrorLogService>();
 builder.Services.AddScoped<PokemonProductSeeder>();
+builder.Services.AddScoped<DigimonProductSeeder>();
 
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
@@ -122,8 +123,10 @@ await runner.RunAsync();
 
 using (var scope = app.Services.CreateScope())
 {
-    var seeder = scope.ServiceProvider.GetRequiredService<PokemonProductSeeder>();
-    //await seeder.SeedAsync();
+    var pokemonSeeder = scope.ServiceProvider.GetRequiredService<PokemonProductSeeder>();
+    var digimonSeeder = scope.ServiceProvider.GetRequiredService<DigimonProductSeeder>();
+    //await pokemonSeeder.SeedAsync();
+    await digimonSeeder.SeedAsync();
 }
 
 if (app.Environment.IsDevelopment())
