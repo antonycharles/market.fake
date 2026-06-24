@@ -9,5 +9,6 @@ namespace Accounts.Login.Web.Extensions
     {
         public const string RefreshToken = "RefreshToken";
         public const string Image = "image";
+        public const string Roles = "roles";
     }
 }

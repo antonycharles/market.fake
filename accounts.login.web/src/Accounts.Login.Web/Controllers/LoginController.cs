@@ -46,13 +46,13 @@ namespace Accounts.Login.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> IndexAsync(string? AppSlug = "accounts-login-web", string? redirectUrl = "")
+        public async Task<IActionResult> IndexAsync(string? appSlug = "market-web", string? redirectUrl = "")
         {
             try
             {
-                if (User.Identity.IsAuthenticated && User.GetRefreshToken() != null && AppSlug != null && AppSlug != "")
+                if (User.Identity.IsAuthenticated && User.GetRefreshToken() != null && appSlug != null && appSlug != "")
                 {
-                    var result = await _userAuthorizationRepository.RefreshTokenAsync(User.GetRefreshToken(), AppSlug, redirectUrl);
+                    var result = await _userAuthorizationRepository.RefreshTokenAsync(User.GetRefreshToken(), appSlug, redirectUrl);
                     var userInfo = await _userAuthorizationRepository.GetUserInfoByTokenAsync(result.Token);
                     await AddCookieAuthentication(result, userInfo);
                     return await GenerateCode(result);
@@ -60,7 +60,7 @@ namespace Accounts.Login.Web.Controllers
 
                 return View(new UserAuthenticationRequest
                 {
-                    AppSlug = AppSlug,
+                    AppSlug = appSlug,
                     RedirectUrl = redirectUrl
                 });
             }
@@ -76,13 +76,13 @@ namespace Accounts.Login.Web.Controllers
                     "Não foi possível iniciar o processo de autenticação agora.",
                     returnAction: "Index",
                     returnController: "Login",
-                    routeValues: new { AppSlug },
+                    routeValues: new { appSlug },
                     returnLabel: "Voltar para login");
             }
 
             return View(new UserAuthenticationRequest
             {
-                AppSlug = AppSlug,
+                AppSlug = appSlug,
                 RedirectUrl = redirectUrl
             });
         }
@@ -178,18 +178,25 @@ namespace Accounts.Login.Web.Controllers
         
         private async Task AddCookieAuthentication(AuthenticationResponse auth, UserResponse userInfo)
         {
-
-            var jwt = _jwtSecurityTokenHandler.ReadJwtToken(auth.Token);
-
+            var loginWebToken = await _userAuthorizationRepository.RefreshTokenAsync(auth.RefreshToken, appSlug: "accounts-login-web", redirectUri: "");
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Sid, userInfo.Id.ToString()),
                 new Claim(ClaimTypes.Name, userInfo.Name),
                 new Claim(ClaimTypes.Email, userInfo.Email),
-                new Claim(CustomClaimTypes.RefreshToken, auth.RefreshToken),
+                new Claim(CustomClaimTypes.RefreshToken, loginWebToken.RefreshToken),
                 new Claim(CustomClaimTypes.Image, userInfo.ImageUrl ?? "")
             };
+
+            var jwt = _jwtSecurityTokenHandler.ReadJwtToken(loginWebToken.Token);
+            if (jwt.Payload.TryGetValue(CustomClaimTypes.Roles, out var rolesValue))
+            {
+                if (rolesValue is string role)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+                }
+            }
 
             var identity = new ClaimsIdentity(claims, "CookieAuth");
             var principal = new ClaimsPrincipal(identity);

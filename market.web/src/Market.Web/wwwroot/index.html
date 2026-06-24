@@ -12,15 +12,18 @@
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link href="Market.Web.styles.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div class="market-loader" role="status" aria-live="polite" aria-label="Carregando Market.Fake">
+            <div class="market-loader__brand" aria-hidden="true">
+                <span>Market</span><span class="market-loader__dot">.</span><span>Fake</span>
+            </div>
+        </div>
     </div>
 
     <div id="blazor-error-ui">

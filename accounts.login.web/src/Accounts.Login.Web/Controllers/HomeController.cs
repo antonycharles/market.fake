@@ -6,6 +6,7 @@ using Accounts.Login.Infra.Repositories.Interfaces;
 using Accounts.Login.Web.Extensions;
 using Accounts.Login.Infra.Settings;
 using Microsoft.Extensions.Options;
+using Accounts.Login.Web.Helpers;
 
 namespace Accounts.Login.Web.Controllers;
 
@@ -28,6 +29,11 @@ public class HomeController : BaseHomeController
     {
         try
         {
+            if(User.IsInRole(RoleConstants.HomeRole.Show) == false)
+            {
+                return RedirectToAction("Index", "Login", new { appSlug = "market-web" });
+            }
+
             var appsPublic = await _appRepository.GetPublicAppsByUserIdAsync(User.GetId());
             return View(new HomeViewModel {
                 Apps = appsPublic.Items.ToList()

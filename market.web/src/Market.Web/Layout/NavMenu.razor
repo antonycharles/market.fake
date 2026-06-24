@@ -133,7 +133,7 @@
     private async Task Logout()
     {
         await LocalStorage.RemoveItemAsync("jwt");
-        Nav.NavigateTo(Config["LoginWebUrl"] ?? "/", true);
+        Nav.NavigateTo(Config["LoginWebUrl"] + "Logout" ?? "/", true);
     }
 
     private void Login()

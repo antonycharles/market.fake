@@ -15,6 +15,7 @@ namespace Accounts.Api.Seeds
             SeederManagement(context);
             SeederMarketApi(context);
             SeederUserApi(context);
+            SeederLoginWeb(context);
 
             context.SaveChanges();
         }
@@ -68,6 +69,27 @@ namespace Accounts.Api.Seeds
 
             permissions.Add(new Permission { Name = "User - authorization", Role = "user-authorization", AppId = app.Id });
             permissions.Add(new Permission { Name = "Token - public key", Role = "token-public-key", AppId = app.Id });
+
+            var permissionsDb = context.Permissions.AsNoTracking().ToList();
+
+            foreach (var permission in permissions)
+            {
+                if (!permissionsDb.Any(w => w.Role == permission.Role && w.AppId == permission.AppId))
+                    context.Permissions.Add(permission);
+            }
+        }
+
+        private static void SeederLoginWeb(AccountsContext context)
+        {
+            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "accounts-login-web");
+
+            if (app == null)
+                return;
+
+            var permissions = new List<Permission>();
+            AddPermissionsAccountsBase(context, app, permissions);
+
+            permissions.Add(new Permission { Name = "Home - show", Role = "home-show", AppId = app.Id });
 
             var permissionsDb = context.Permissions.AsNoTracking().ToList();
 

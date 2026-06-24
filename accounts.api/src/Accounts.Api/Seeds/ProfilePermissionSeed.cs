@@ -12,6 +12,7 @@ namespace Accounts.Api.Seeds
     public class ProfilePermissionSeed
     {
         public static void Seeder(AccountsContext context){
+            SeederLoginWeb(context);
             SeederAccountsApiAdmin(context);
             SeederAccountsApiLogin(context);
             SeederAccountsApiInfo(context);
@@ -145,6 +146,30 @@ namespace Accounts.Api.Seeds
                 "user-create",
                 "user-update",
                 "app-list"
+            };
+
+            var permissions = context.Permissions.AsNoTracking()
+                .Where(w => w.AppId == app.Id && roles.Contains(w.Role)).ToList();
+
+            AddProfilePermission(context, profile, permissions);
+        }
+
+        private static void SeederLoginWeb(AccountsContext context)
+        {
+            var app = context.Apps.AsNoTracking().FirstOrDefault(w => w.Slug == "accounts-login-web");
+
+            if(app == null)
+                return;
+
+            var profile = context.Profiles.AsNoTracking()
+                .FirstOrDefault(w => w.Slug == "admin" && w.AppId == app.Id);
+
+            if(profile == null)
+                return;
+
+            var roles = new List<string>
+            {
+                "home-show"
             };
 
             var permissions = context.Permissions.AsNoTracking()

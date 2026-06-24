@@ -28,38 +28,78 @@
         content: "An error has occurred."
     }
 
-.loading-progress {
+#app:has(.market-loader) {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    background:
+        radial-gradient(circle at 50% 45%, rgba(37, 99, 235, 0.08), transparent 26rem),
+        #f8fafc;
+}
+
+.market-loader {
+    display: flex;
+    width: min(22rem, calc(100vw - 3rem));
+    flex-direction: column;
+    align-items: center;
+}
+
+.market-loader__brand {
     position: relative;
-    display: block;
-    width: 8rem;
-    height: 8rem;
-    margin: 20vh auto 1rem auto;
+    color: gray;
+    font-size: 3rem;
+    font-family: "Orbitron", sans-serif;
+    font-weight: 800;
+    line-height: 1;
+    overflow: hidden;
 }
 
-    .loading-progress circle {
-        fill: none;
-        stroke: #e0e0e0;
-        stroke-width: 0.6rem;
-        transform-origin: 50% 50%;
-        transform: rotate(-90deg);
-    }
-
-        .loading-progress circle:last-child {
-            stroke: #1b6ec2;
-            stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
-            transition: stroke-dasharray 0.05s ease-in-out;
-        }
-
-.loading-progress-text {
+.market-loader__brand::after {
     position: absolute;
-    text-align: center;
-    font-weight: bold;
-    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+    inset: 0;
+    background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.85) 48%,
+        transparent 66%
+    );
+    content: "";
+    transform: translateX(-130%);
+    animation: market-loader-shine 1.8s ease-in-out infinite;
 }
 
-    .loading-progress-text:after {
-        content: var(--blazor-load-percentage-text, "Loading");
+.market-loader__dot {
+    display: inline-block;
+    color: #2563eb;
+    animation: market-loader-pulse 1.2s ease-in-out infinite;
+}
+
+
+
+@keyframes market-loader-shine {
+    55%, 100% {
+        transform: translateX(130%);
     }
+}
+
+@keyframes market-loader-pulse {
+    0%, 100% {
+        opacity: 0.45;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-0.12em);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .market-loader__brand::after,
+    .market-loader__dot {
+        animation: none;
+    }
+}
 
 code {
     color: #c02d76;
