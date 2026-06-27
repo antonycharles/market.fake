@@ -1,15 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Accounts.Login.Infra.Exceptions;
-using Accounts.Login.Infra.Repositories.Interfaces;
 using Accounts.Login.Infra.Settings;
-using Accounts.Login.Web.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Accounts.Login.Web.Controllers
