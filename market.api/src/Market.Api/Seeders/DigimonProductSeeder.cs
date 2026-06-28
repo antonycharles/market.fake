@@ -234,40 +234,27 @@ namespace Market.Api.Seeders
 
         private async Task<CategoryDto> GetOrCreateCategoryAsync(string typeName)
         {
-            var slug = $"digimon-{ToSlug(typeName)}";
-            var existingCategory = await FindCategoryBySlugAsync(slug);
-
-            if (existingCategory is not null)
-                return existingCategory;
-
+            var slug = ToSlug(typeName.ToLowerInvariant());
             try
-            {
-                return await _categoryService.AddAsync(new CategoryCreateDto
-                {
-                    Name = typeName,
-                    Slug = slug,
-                    Description = $"Digimon type: {typeName}."
-                });
-            }
-            catch (BusinessException ex) when (ex.Message.Contains("slug already exists", StringComparison.OrdinalIgnoreCase))
-            {
-                var category = await FindCategoryBySlugAsync(slug);
+            { 
+                var existingCategory = await _categoryService.GetBySlugAsync(slug);
 
-                if (category is not null)
-                    return category;
-
-                throw;
+                if (existingCategory is not null)
+                    return existingCategory;
+                    
+            }catch(BusinessException ex)
+            {
+                
             }
+
+            return await _categoryService.AddAsync(new CategoryCreateDto
+            {
+                Name = typeName,
+                Slug = slug,
+                Description = $"Digimon type: {typeName}."
+            });
         }
 
-        private async Task<CategoryDto?> FindCategoryBySlugAsync(string slug)
-        {
-            var categories = await _categoryService.GetPagedAsync(
-                new PaginationRequestDto { PageIndex = 1, PageSize = 1000 });
-
-            return categories.Items.FirstOrDefault(category =>
-                string.Equals(category.Slug, slug, StringComparison.OrdinalIgnoreCase));
-        }
 
         private async Task<T> GetFromDigiApiAsync<T>(string url, CancellationToken cancellationToken)
         {
@@ -295,17 +282,9 @@ namespace Market.Api.Seeders
 
         private static string BuildSummary(DigimonApiResponse digimon)
         {
-            var level = string.Join(", ", digimon.Levels.Select(item => item.Level));
-            var type = string.Join(", ", digimon.Types.Select(item => item.Type));
-            var attribute = string.Join(", ", digimon.Attributes.Select(item => item.Attribute));
-
-            return string.Join(" ", new[]
-            {
-                $"{digimon.Name} is a {(string.IsNullOrWhiteSpace(type) ? "Digimon" : type)} Digimon.",
-                string.IsNullOrWhiteSpace(level) ? null : $"Level: {level}.",
-                string.IsNullOrWhiteSpace(attribute) ? null : $"Attribute: {attribute}.",
-                GetEnglishDescription(digimon)
-            }.Where(value => !string.IsNullOrWhiteSpace(value)));
+            var description = GetEnglishDescription(digimon);
+            description = description.Length > 200 ? description[..150] + "..." : description;
+            return description;
         }
 
         private static string BuildDescription(DigimonApiResponse digimon)

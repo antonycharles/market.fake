@@ -269,37 +269,17 @@ namespace Market.Api.Seeders
         private async Task<CategoryDto> GetOrCreateCategoryAsync(string typeName)
         {
             var slug = typeName.ToLowerInvariant();
-            var existingCategory = await FindCategoryBySlugAsync(slug);
+            var category = await _categoryService.GetBySlugAsync(slug);
 
-            if (existingCategory is not null)
-                return existingCategory;
+            if (category is not null)
+                return category;
 
-            try
+            return await _categoryService.AddAsync(new CategoryCreateDto
             {
-                return await _categoryService.AddAsync(new CategoryCreateDto
-                {
-                    Name = ToTitleCase(typeName),
-                    Slug = slug,
-                    Description = $"Pokemon type: {ToTitleCase(typeName)}."
-                });
-            }
-            catch (BusinessException ex) when (ex.Message.Contains("slug already exists", StringComparison.OrdinalIgnoreCase))
-            {
-                var category = await FindCategoryBySlugAsync(slug);
-
-                if (category is not null)
-                    return category;
-
-                throw;
-            }
-        }
-
-        private async Task<CategoryDto?> FindCategoryBySlugAsync(string slug)
-        {
-            var categories = await _categoryService.GetPagedAsync(new PaginationRequestDto { PageIndex = 1, PageSize = 1000 });
-
-            return categories.Items.FirstOrDefault(category =>
-                string.Equals(category.Slug, slug, StringComparison.OrdinalIgnoreCase));
+                Name = ToTitleCase(typeName),
+                Slug = slug,
+                Description = $"Pokemon type: {ToTitleCase(typeName)}."
+            });
         }
 
         private async Task<T> GetFromPokeApiAsync<T>(string url, CancellationToken cancellationToken)

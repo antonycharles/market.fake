@@ -4,5 +4,6 @@ namespace Market.Application.Interfaces
 {
     public interface ICategoryService : ICrudService<CategoryDto, CategoryCreateDto, CategoryUpdateDto>
     {
+        Task<CategoryDto?> GetBySlugAsync(string slug);
     }
 }

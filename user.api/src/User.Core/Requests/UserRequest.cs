@@ -12,9 +12,6 @@ namespace User.Core.Requests
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "Password is required")]
-        public string Password { get; set; }
-
         public StatusEnum? Status { get; set; }
     }
 }

@@ -15,6 +15,16 @@ namespace Market.Application.Services
             _repository = repository;
         }
 
+        public async Task<CategoryDto?> GetBySlugAsync(string slug)
+        {
+            var entity = await _repository.GetBySlugAsync(slug);
+
+            if (entity == null)
+                throw new BusinessException($"Category not found");
+
+            return ToDto(entity);
+        }
+        
         protected override async Task ValidateCreateAsync(CategoryCreateDto dto)
         {
             if (await _repository.SlugExistsAsync(dto.Slug))
@@ -54,5 +64,6 @@ namespace Market.Application.Services
             UpdatedAt = entity.UpdatedAt,
             Status = entity.Status
         };
+
     }
 }

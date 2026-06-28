@@ -12,8 +12,8 @@ using User.Infrastructure.Data;
 namespace User.Infrastructure.Migrations
 {
     [DbContext(typeof(UserContext))]
-    [Migration("20260607211035_StartDB")]
-    partial class StartDB
+    [Migration("20260628185600_StartedDB")]
+    partial class StartedDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

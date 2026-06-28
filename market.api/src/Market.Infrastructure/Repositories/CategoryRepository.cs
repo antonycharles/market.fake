@@ -17,6 +17,18 @@ namespace Market.Infrastructure.Repositories
         protected override string InsertValues => @"@Id, @Name, @Slug, @Description, @CreatedAt, @UpdatedAt, @Status";
         protected override string UpdateAssignments => @"""Name"" = @Name, ""Slug"" = @Slug, ""Description"" = @Description, ""Status"" = @Status, ""UpdatedAt"" = @UpdatedAt";
 
+        public async Task<Category?> GetBySlugAsync(string slug)
+        {
+            using var connection = await ConnectionFactory.CreateOpenConnectionAsync();
+
+            var sql = $@"
+                SELECT {SelectColumns}
+                FROM ""{TableName}""
+                WHERE ""Slug"" = @Slug AND ""DeletedAt"" IS NULL";
+
+            return await connection.QueryFirstOrDefaultAsync<Category>(sql, new { Slug = slug });
+        }
+
         public async Task<bool> SlugExistsAsync(string slug, Guid? ignoreId = null)
         {
             using var connection = await ConnectionFactory.CreateOpenConnectionAsync();

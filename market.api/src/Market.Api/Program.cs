@@ -126,7 +126,7 @@ using (var scope = app.Services.CreateScope())
     var pokemonSeeder = scope.ServiceProvider.GetRequiredService<PokemonProductSeeder>();
     var digimonSeeder = scope.ServiceProvider.GetRequiredService<DigimonProductSeeder>();
     //await pokemonSeeder.SeedAsync();
-    await digimonSeeder.SeedAsync();
+    //await digimonSeeder.SeedAsync();
 }
 
 if (app.Environment.IsDevelopment())
